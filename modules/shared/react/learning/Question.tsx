@@ -9,6 +9,10 @@ export interface QuestionOption {
   key?: string;
   value: string;
   label: ReactNode;
+  /** Explanation shown when this incorrect option is selected. */
+  wrongFeedback?: ReactNode;
+  /** Explanation shown when this correct option is omitted from a multiple-choice answer. */
+  missedFeedback?: ReactNode;
 }
 
 export interface QuestionCheckResult {
@@ -84,6 +88,27 @@ function FillTitle({ title, blanks, fields, onChange }: { title: ReactNode; blan
 function inlineBlankCount(title: ReactNode) {
   if (typeof title !== 'string') return 1;
   return Math.max(1, title.split('____').length - 1);
+}
+
+function optionFeedback(
+  options: QuestionOption[],
+  selectedValues: string[],
+  expectedValues: string[],
+  multiple: boolean,
+  fallback: ReactNode,
+) {
+  const selected = new Set(selectedValues.map(normalize));
+  const expected = new Set(expectedValues);
+  const incorrect = options.filter((option) => selected.has(normalize(option.value)) && !expected.has(normalize(option.value)));
+  const missed = multiple ? options.filter((option) => expected.has(normalize(option.value)) && !selected.has(normalize(option.value))) : [];
+  const optionKey = (option: QuestionOption) => option.key ?? String.fromCharCode(65 + options.indexOf(option));
+  const details = [
+    ...incorrect.map((option) => ({ prefix: `误选 ${optionKey(option)}：`, message: option.wrongFeedback })),
+    ...missed.map((option) => ({ prefix: `漏选 ${optionKey(option)}：`, message: option.missedFeedback })),
+  ].filter((detail) => detail.message !== undefined && detail.message !== null && detail.message !== false && detail.message !== '');
+  if (!details.length) return fallback;
+  if (details.length === 1) return <><strong>{details[0].prefix}</strong>{details[0].message}</>;
+  return <ul className="dl-question-feedback-list">{details.map((detail, index) => <li key={index}><strong>{detail.prefix}</strong>{detail.message}</li>)}</ul>;
 }
 
 function typeLabel(type: QuestionType, multiple: boolean) {
@@ -172,7 +197,7 @@ export function Question({
           empty: storedResult.empty,
           answer: Array.isArray(storedResult.answer) ? storedResult.answer.map(String) : restoredAnswers,
           tone: storedResult.tone,
-          message: storedResult.message,
+          message: storedResult.message ?? (storedResult.ok ? feedback.correct ?? '回答正确。' : optionFeedback(options, restoredAnswers, expected, multiple, feedback.wrong ?? '再检查一下。')),
         };
         setResult(restoredResult);
         onCheck?.(restoredResult);
@@ -213,7 +238,7 @@ export function Question({
           empty: restoredEmpty,
           answer: restoredAnswers,
           tone: restoredCorrect ? 'correct' : normalizedType === 'short' ? 'hint' : 'wrong',
-          message: restoredCorrect ? feedback.correct ?? '回答正确。' : feedback.wrong ?? '再检查一下。',
+          message: restoredCorrect ? feedback.correct ?? '回答正确。' : optionFeedback(options, restoredAnswers, expected, multiple, feedback.wrong ?? '再检查一下。'),
         };
         setResult(restoredResult);
         onCheck?.(restoredResult);
@@ -253,7 +278,7 @@ export function Question({
       ? feedback.empty ?? '请先完成作答，再检查答案。'
       : normalizedType === 'short'
         ? feedback.sample ?? '此简答题尚未配置评阅服务，不能作为已完成作答。'
-        : ok ? feedback.correct ?? '回答正确。' : feedback.wrong ?? '再检查一下。';
+        : ok ? feedback.correct ?? '回答正确。' : optionFeedback(options, candidateAnswers, expected, multiple, feedback.wrong ?? '再检查一下。');
     const next: QuestionCheckResult = {
       ok: !empty && ok,
       empty,
