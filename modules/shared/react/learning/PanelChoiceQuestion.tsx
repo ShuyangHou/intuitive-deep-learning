@@ -8,6 +8,7 @@ export interface PanelChoiceOption {
   title: ReactNode;
   caption?: ReactNode;
   media: ReactNode;
+  wrongFeedback?: ReactNode;
 }
 
 export interface PanelChoiceQuestionProps {
@@ -27,7 +28,8 @@ export function PanelChoiceQuestion({
 }: PanelChoiceQuestionProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const correct = selected === answer;
-  const message = selected === null ? feedback.initial : correct ? feedback.correct : feedback.wrong;
+  const selectedOption = options.find((option) => option.value === selected);
+  const message = selected === null ? feedback.initial : correct ? feedback.correct : selectedOption?.wrongFeedback ?? feedback.wrong;
 
   return (
     <section className="dl-question" aria-label={String(typeLabel)}>

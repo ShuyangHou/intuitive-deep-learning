@@ -232,6 +232,8 @@ svg .edu-attention-hint { fill: none; stroke: rgba(var(--attention-hint-rgb), .5
 .dl-question-fields { display: grid; gap: 10px; }
 .dl-question-field { display: grid; gap: 6px; }
 .dl-question-field span { color: var(--ui-accent); font-size: 13px; font-weight: 900; }
+.dl-question-feedback-list { display: grid; gap: 5px; margin: 0; padding-left: 20px; }
+.dl-question-feedback-list li { padding-left: 2px; }
 .dl-question-field input, .dl-question-field textarea { width: 100%; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-sm); background: #fff; color: var(--ui-text-main); padding: 10px 12px; }
 .dl-question-field input { height: 42px; }
 .dl-question-field textarea { min-height: 116px; resize: vertical; }

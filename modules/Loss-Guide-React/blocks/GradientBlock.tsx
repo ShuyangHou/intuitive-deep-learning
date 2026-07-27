@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Callout, ContentBlock, FormulaBlock, NoticeStrip, Question } from '../../shared/react';
+import { Callout, ContentBlock, FormulaBlock, FormulaTerm, NoticeStrip, Question } from '../../shared/react';
 import type { LessonBlockProps } from './NumberLineBlock';
 import { lossGuideStateKey } from '../lessonConfig';
 
@@ -23,10 +23,14 @@ export function GradientBlock({ onComplete }: LessonBlockProps) {
         <h3>绝对误差的梯度：大小固定，零点例外</h3>
         <div className="lg-react-formula-grid">
           <FormulaBlock ariaLabel="绝对误差公式">
-            ℓ<sub>abs</sub>(y, ŷ) = |ŷ − y|
+            <FormulaTerm tooltip="ℓabs：单个样本的绝对误差损失">ℓ<sub>abs</sub></FormulaTerm>
+            (<FormulaTerm tooltip="y：样本的真实目标值">y</FormulaTerm>,{' '}
+            <FormulaTerm tooltip="ŷ：模型对该样本给出的预测值">ŷ</FormulaTerm>) = |
+            <FormulaTerm tooltip="ŷ − y：本模块统一采用的有符号误差">ŷ − y</FormulaTerm>|
           </FormulaBlock>
           <FormulaBlock ariaLabel="绝对误差在非零误差处的梯度">
-            ∂ℓ<sub>abs</sub>/∂ŷ = −1（ŷ &lt; y），+1（ŷ &gt; y）
+            <FormulaTerm tooltip="对预测值 ŷ 求偏导，观察预测变化如何影响损失">∂ℓ<sub>abs</sub>/∂ŷ</FormulaTerm>
+            {' '}= −1（ŷ &lt; y），+1（ŷ &gt; y）
           </FormulaBlock>
         </div>
         <Question
@@ -35,7 +39,12 @@ export function GradientBlock({ onComplete }: LessonBlockProps) {
           title="当 ŷ > y 时，绝对误差对 ŷ 的梯度为 +1；执行梯度下降会让 ŷ 减小并靠近 y。"
           options={[
             { key: '对', value: 'true', label: '正确' },
-            { key: '错', value: 'false', label: '错误' },
+            {
+              key: '错',
+              value: 'false',
+              label: '错误',
+              wrongFeedback: '梯度下降使用 ŷ ← ŷ − η·∂ℓ/∂ŷ；正梯度会使预测值减小。',
+            },
           ]}
           answer="true"
           feedback={{ correct: '正确。更新式 ŷ ← ŷ − η·1 会减小预测值。' }}
@@ -47,7 +56,8 @@ export function GradientBlock({ onComplete }: LessonBlockProps) {
         <section className="lg-react-gradient-step">
           <h3>不可导不等于无法优化</h3>
           <FormulaBlock ariaLabel="绝对误差在零点的次梯度">
-            ŷ = y 时不可导；次梯度集合 ∂ℓ<sub>abs</sub> = [−1, 1]
+            ŷ = y 时不可导；次梯度集合{' '}
+            <FormulaTerm tooltip="次梯度集合包含尖角处所有合法的广义斜率">∂ℓ<sub>abs</sub> = [−1, 1]</FormulaTerm>
           </FormulaBlock>
           <p className="edu-body">
             绝对值函数在零点有尖角，普通导数不存在。优化算法通常选取集合中的一个次梯度；取 0 时，已经命中目标的预测不会继续移动。
@@ -58,7 +68,12 @@ export function GradientBlock({ onComplete }: LessonBlockProps) {
             title="在 ŷ = y 时取 0 作为绝对误差的次梯度，是一个合法选择。"
             options={[
               { key: '对', value: 'true', label: '正确，0 属于 [−1, 1]' },
-              { key: '错', value: 'false', label: '错误，不可导就无法更新' },
+              {
+                key: '错',
+                value: 'false',
+                label: '错误，不可导就无法更新',
+                wrongFeedback: '普通导数不存在时仍可使用次梯度；0 正好属于区间 [−1, 1]。',
+              },
             ]}
             answer="true"
             feedback={{ correct: '正确。这里必须区分“导数不存在”和“没有可用的优化方向”。' }}
@@ -72,24 +87,36 @@ export function GradientBlock({ onComplete }: LessonBlockProps) {
           <h3>MSE 的梯度：误差越大，更新信号越强</h3>
           <div className="lg-react-formula-grid">
             <FormulaBlock ariaLabel="均方误差公式">
-              L<sub>MSE</sub> = (1/n) Σ<sub>i=1</sub><sup>n</sup> (ŷ<sub>i</sub> − y<sub>i</sub>)²
+              <FormulaTerm tooltip="LMSE：对一个批次或数据集的平方误差取平均">L<sub>MSE</sub></FormulaTerm>
+              {' '}= (1/n) Σ<sub>i=1</sub><sup>n</sup> (ŷ<sub>i</sub> − y<sub>i</sub>)²
             </FormulaBlock>
             <FormulaBlock ariaLabel="均方误差对单个预测的梯度">
-              ∂L<sub>MSE</sub>/∂ŷ<sub>i</sub> = (2/n)(ŷ<sub>i</sub> − y<sub>i</sub>)
+              <FormulaTerm tooltip="对第 i 个预测值求偏导">∂L<sub>MSE</sub>/∂ŷ<sub>i</sub></FormulaTerm>
+              {' '}= (2/n)(ŷ<sub>i</sub> − y<sub>i</sub>)
             </FormulaBlock>
           </div>
           <NoticeStrip tone="orange" lead="约定会改变常数：">
             有些教材使用 (1/2n)Σ(ŷ−y)²，使梯度中的系数 2 消失。两种定义都正确，但整节课必须保持同一约定。
           </NoticeStrip>
           <FormulaBlock ariaLabel="梯度下降更新预测值">
-            ŷ<sub>i</sub> ← ŷ<sub>i</sub> − η · ∂L/∂ŷ<sub>i</sub>
+            ŷ<sub>i</sub> ← ŷ<sub>i</sub> −{' '}
+            <FormulaTerm tooltip="η：学习率，控制每次沿负梯度方向移动的步长">η</FormulaTerm>
+            {' '}· ∂L/∂ŷ<sub>i</sub>
           </FormulaBlock>
           <Question
             persistenceKey={lossGuideStateKey('mse-gradient')}
             title="同一批次中，样本 A 的 |ŷ−y| = 1，样本 B 的 |ŷ−y| = 5。使用 MSE 时，哪个样本产生的梯度绝对值更大？"
             options={[
-              { value: 'same', label: '两者相同，梯度只记录方向' },
-              { value: 'a', label: '样本 A 更大' },
+              {
+                value: 'same',
+                label: '两者相同，梯度只记录方向',
+                wrongFeedback: 'MSE 梯度与误差 ŷ−y 成正比，不只记录方向。',
+              },
+              {
+                value: 'a',
+                label: '样本 A 更大',
+                wrongFeedback: '两个样本共享相同的 2/n 系数，比较误差绝对值即可。',
+              },
               { value: 'b', label: '样本 B 更大，约为 A 的 5 倍' },
             ]}
             answer="b"
