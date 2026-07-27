@@ -8,5 +8,14 @@ const videos = [
 ];
 
 export function ResourcesBlock() {
-  return <LessonFooter className="lg-react-block" title="继续你的学习旅程" description="你可以返回课程目录，或在准备好后继续前往下一步。" back={{ href: '../CourseMap/', label: '返回课程目录' }} next={{ href: '../Gradient-Descent-Module/', label: '学习下一课' }} videos={videos} />;
+  return (
+    <LessonFooter
+      className="lg-react-block"
+      title="把损失交给梯度下降"
+      description="你已经完成从单样本误差、数据集 reduction、离群点影响到梯度与概率假设的推理链。下一课将观察参数怎样沿负梯度方向更新。"
+      back={{ href: '../CourseMap/', label: '返回课程目录' }}
+      next={{ href: '../Gradient-Descent-Module/', label: '学习梯度下降' }}
+      videos={videos}
+    />
+  );
 }

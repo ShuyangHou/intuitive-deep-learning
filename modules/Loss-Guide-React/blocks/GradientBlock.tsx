@@ -1,20 +1,105 @@
 import { useState } from 'react';
-import { Callout } from '../../shared/react/feedback/Callout';
-import { ContentBlock } from '../../shared/react/layout/ContentBlock';
-import { FormulaBlock, FormulaTerm } from '../../shared/react/learning/FormulaBlock';
-import { Question } from '../../shared/react/learning/Question';
+import { Callout, ContentBlock, FormulaBlock, NoticeStrip, Question } from '../../shared/react';
 import type { LessonBlockProps } from './NumberLineBlock';
+import { lossGuideStateKey } from '../lessonConfig';
 
 export function GradientBlock({ onComplete }: LessonBlockProps) {
-  const [l1Complete, setL1Complete] = useState(false);
-  const [l2Complete, setL2Complete] = useState(false);
+  const [absoluteComplete, setAbsoluteComplete] = useState(false);
+  const [zeroComplete, setZeroComplete] = useState(false);
 
   return (
-    <ContentBlock className="lg-react-block" title="计算 L1 与 L2 的梯度" subtitle="损失告诉我们错了多少；梯度进一步告诉模型预测值应该往哪个方向改，以及需要多强的修正。">
-      <Callout tone="blue" label="怎样读梯度" text="梯度的正负表示修正方向，绝对值表示当前误差产生的修正强度。训练时会沿梯度的反方向更新预测。" />
-      <section className="lg-react-gradient-step"><h3>L1 Loss</h3><FormulaBlock ariaLabel="L1 损失公式"><FormulaTerm tooltip="L1：用绝对误差衡量预测偏差的损失">L₁</FormulaTerm> = <FormulaTerm tooltip="绝对值：只关心预测和真实值相差多远，不区分正负方向">|</FormulaTerm><FormulaTerm tooltip="y：数据中给出的真实目标值">y</FormulaTerm> − <FormulaTerm tooltip="ŷ：模型根据输入给出的预测值，读作 y hat">ŷ</FormulaTerm><FormulaTerm tooltip="绝对值：取差值的大小，结果始终不小于 0">|</FormulaTerm></FormulaBlock><FormulaBlock ariaLabel="L1 梯度公式"><FormulaTerm tooltip="∂：偏导符号，表示只考察一个量微小变化时带来的影响">∂</FormulaTerm><FormulaTerm tooltip="L1：绝对误差损失，等于预测值与真实值之差的绝对值">L₁</FormulaTerm>/<FormulaTerm tooltip="∂：这里表示对预测值 ŷ 求偏导">∂</FormulaTerm><FormulaTerm tooltip="ŷ：模型给出的预测值；分母说明我们关心改变预测值会怎样影响损失">ŷ</FormulaTerm> = <FormulaTerm tooltip="sign：只保留预测误差的正负号">sign</FormulaTerm>(<FormulaTerm tooltip="ŷ：模型当前给出的预测值">ŷ</FormulaTerm> − <FormulaTerm tooltip="y：数据中给出的真实目标值">y</FormulaTerm>)</FormulaBlock><Question persistenceKey="l1-gradient" type="judgement" title="L1 Loss 的梯度包含误差大小信息。" options={[{ key: '对', value: 'true', label: '有，误差越大梯度绝对值越大' }, { key: '错', value: 'false', label: '没有，它只用正负号表示方向' }]} answer="false" feedback={{ correct: '正确。L1 梯度通常只有 -1 或 +1，不会保留误差大小。' }} onCheck={(result) => setL1Complete(result.ok)} /></section>
-      {l1Complete && <section className="lg-react-gradient-step"><h3>L2 Loss</h3><FormulaBlock ariaLabel="L2 损失公式"><FormulaTerm tooltip="L2：用平方误差衡量预测偏差的损失">L₂</FormulaTerm> = (<FormulaTerm tooltip="y：数据中给出的真实目标值">y</FormulaTerm> − <FormulaTerm tooltip="ŷ：模型根据输入给出的预测值，读作 y hat">ŷ</FormulaTerm>)<FormulaTerm tooltip="平方：把较大的误差放大得更明显">²</FormulaTerm></FormulaBlock><FormulaBlock ariaLabel="L2 梯度公式"><FormulaTerm tooltip="∂：偏导符号，表示只考察一个量微小变化时带来的影响">∂</FormulaTerm><FormulaTerm tooltip="L2：平方误差损失，等于预测值与真实值之差的平方">L₂</FormulaTerm>/<FormulaTerm tooltip="∂：这里表示对预测值 ŷ 求偏导">∂</FormulaTerm><FormulaTerm tooltip="ŷ：模型给出的预测值；分母说明我们关心改变预测值会怎样影响损失">ŷ</FormulaTerm> = <FormulaTerm tooltip="系数 2：来自平方求导">2</FormulaTerm>(<FormulaTerm tooltip="ŷ：模型当前给出的预测值">ŷ</FormulaTerm> − <FormulaTerm tooltip="y：数据中给出的真实目标值">y</FormulaTerm>)</FormulaBlock><Question persistenceKey="l2-gradient" type="judgement" title="L2 Loss 的梯度包含误差大小信息。" options={[{ key: '对', value: 'true', label: '有，梯度绝对值会随误差变化' }, { key: '错', value: 'false', label: '没有，梯度绝对值始终固定' }]} answer="true" feedback={{ correct: '正确。L2 梯度既提供方向，也会随着误差大小改变修正强度。' }} onCheck={(result) => setL2Complete(result.ok)} /></section>}
-      {l2Complete && <Question persistenceKey="gradient-comparison" type="judgement" title="L1 的梯度只有方向信息，这是否意味着 L1 Loss 一定不如 L2 Loss？" options={[{ key: '对', value: 'true', label: '是，L2 永远更好' }, { key: '错', value: 'false', label: '不是，两者适合不同的误差假设' }]} answer="false" feedback={{ correct: '正确。面对离群点时，L1 不会让单个异常样本无限放大更新。' }} onCheck={(result) => { if (result.ok) onComplete(); }} />}
+    <ContentBlock
+      className="lg-react-block"
+      title="梯度怎样把损失变成更新信号？"
+      subtitle="损失是一个标量；梯度描述预测值发生微小变化时，损失上升最快的方向和变化率。训练时沿负梯度方向更新。"
+    >
+      <Callout
+        tone="blue"
+        label="符号方向"
+        text="梯度为正表示增大 ŷ 会让损失上升，因此梯度下降会减小 ŷ；梯度为负时则相反。"
+      />
+
+      <section className="lg-react-gradient-step">
+        <h3>绝对误差的梯度：大小固定，零点例外</h3>
+        <div className="lg-react-formula-grid">
+          <FormulaBlock ariaLabel="绝对误差公式">
+            ℓ<sub>abs</sub>(y, ŷ) = |ŷ − y|
+          </FormulaBlock>
+          <FormulaBlock ariaLabel="绝对误差在非零误差处的梯度">
+            ∂ℓ<sub>abs</sub>/∂ŷ = −1（ŷ &lt; y），+1（ŷ &gt; y）
+          </FormulaBlock>
+        </div>
+        <Question
+          persistenceKey={lossGuideStateKey('absolute-gradient-direction')}
+          type="judgement"
+          title="当 ŷ > y 时，绝对误差对 ŷ 的梯度为 +1；执行梯度下降会让 ŷ 减小并靠近 y。"
+          options={[
+            { key: '对', value: 'true', label: '正确' },
+            { key: '错', value: 'false', label: '错误' },
+          ]}
+          answer="true"
+          feedback={{ correct: '正确。更新式 ŷ ← ŷ − η·1 会减小预测值。' }}
+          onCheck={(result) => setAbsoluteComplete(result.ok)}
+        />
+      </section>
+
+      {absoluteComplete && (
+        <section className="lg-react-gradient-step">
+          <h3>不可导不等于无法优化</h3>
+          <FormulaBlock ariaLabel="绝对误差在零点的次梯度">
+            ŷ = y 时不可导；次梯度集合 ∂ℓ<sub>abs</sub> = [−1, 1]
+          </FormulaBlock>
+          <p className="edu-body">
+            绝对值函数在零点有尖角，普通导数不存在。优化算法通常选取集合中的一个次梯度；取 0 时，已经命中目标的预测不会继续移动。
+          </p>
+          <Question
+            persistenceKey={lossGuideStateKey('absolute-subgradient')}
+            type="judgement"
+            title="在 ŷ = y 时取 0 作为绝对误差的次梯度，是一个合法选择。"
+            options={[
+              { key: '对', value: 'true', label: '正确，0 属于 [−1, 1]' },
+              { key: '错', value: 'false', label: '错误，不可导就无法更新' },
+            ]}
+            answer="true"
+            feedback={{ correct: '正确。这里必须区分“导数不存在”和“没有可用的优化方向”。' }}
+            onCheck={(result) => setZeroComplete(result.ok)}
+          />
+        </section>
+      )}
+
+      {zeroComplete && (
+        <section className="lg-react-gradient-step">
+          <h3>MSE 的梯度：误差越大，更新信号越强</h3>
+          <div className="lg-react-formula-grid">
+            <FormulaBlock ariaLabel="均方误差公式">
+              L<sub>MSE</sub> = (1/n) Σ<sub>i=1</sub><sup>n</sup> (ŷ<sub>i</sub> − y<sub>i</sub>)²
+            </FormulaBlock>
+            <FormulaBlock ariaLabel="均方误差对单个预测的梯度">
+              ∂L<sub>MSE</sub>/∂ŷ<sub>i</sub> = (2/n)(ŷ<sub>i</sub> − y<sub>i</sub>)
+            </FormulaBlock>
+          </div>
+          <NoticeStrip tone="orange" lead="约定会改变常数：">
+            有些教材使用 (1/2n)Σ(ŷ−y)²，使梯度中的系数 2 消失。两种定义都正确，但整节课必须保持同一约定。
+          </NoticeStrip>
+          <FormulaBlock ariaLabel="梯度下降更新预测值">
+            ŷ<sub>i</sub> ← ŷ<sub>i</sub> − η · ∂L/∂ŷ<sub>i</sub>
+          </FormulaBlock>
+          <Question
+            persistenceKey={lossGuideStateKey('mse-gradient')}
+            title="同一批次中，样本 A 的 |ŷ−y| = 1，样本 B 的 |ŷ−y| = 5。使用 MSE 时，哪个样本产生的梯度绝对值更大？"
+            options={[
+              { value: 'same', label: '两者相同，梯度只记录方向' },
+              { value: 'a', label: '样本 A 更大' },
+              { value: 'b', label: '样本 B 更大，约为 A 的 5 倍' },
+            ]}
+            answer="b"
+            feedback={{ correct: '正确。MSE 梯度保留误差大小，这也解释了离群点为什么可能主导更新。' }}
+            onCheck={(result) => {
+              if (result.ok) onComplete();
+            }}
+          />
+        </section>
+      )}
     </ContentBlock>
   );
 }

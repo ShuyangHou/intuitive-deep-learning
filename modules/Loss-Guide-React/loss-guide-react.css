@@ -1,8 +1,89 @@
 .lg-react-shell { --edu-scaled-shell-width: 980px; }
 .lg-react-block { min-width: 0; }
-.lg-react-numberline { overflow: hidden; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md); background: #fbfdff; }
+
+.lg-react-course-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin-bottom: 24px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-bg-muted);
+  padding: 12px 16px;
+  color: var(--ui-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.lg-react-course-note strong { color: var(--ui-accent); }
+
+.lg-react-agenda {
+  margin: -12px 0 24px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: #fff;
+  color: var(--ui-text-main);
+}
+.lg-react-agenda summary {
+  cursor: pointer;
+  padding: 12px 16px;
+  color: var(--ui-accent);
+  font-size: 13px;
+  font-weight: 850;
+}
+.lg-react-agenda summary:focus-visible {
+  border-radius: var(--ui-radius-sm);
+  outline: 3px solid color-mix(in srgb, var(--ui-accent) 24%, transparent);
+  outline-offset: 2px;
+}
+.lg-react-agenda[open] summary { border-bottom: 1px solid var(--ui-border); }
+.lg-react-agenda ol {
+  display: grid;
+  margin: 0;
+  padding: 4px 18px 4px 50px;
+}
+.lg-react-agenda li { padding: 11px 0 10px 4px; }
+.lg-react-agenda li + li { border-top: 1px solid var(--ui-border); }
+.lg-react-agenda li::marker {
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.lg-react-agenda li > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.lg-react-agenda li strong { font-size: 14px; }
+.lg-react-agenda li span {
+  flex: 0 0 auto;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+.lg-react-agenda li p {
+  margin: 4px 0 0;
+  color: var(--ui-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.lg-react-agenda li.is-extension::marker,
+.lg-react-agenda li.is-extension strong { color: var(--ui-accent-alt); }
+
+.lg-react-numberline {
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background: #fbfdff;
+}
 .lg-react-numberline svg { display: block; width: 100%; height: auto; }
-.lg-react-numberline text { fill: var(--ui-text-muted); font-family: var(--ui-font-sans); font-size: 13px; font-weight: 750; }
+.lg-react-numberline text {
+  fill: var(--ui-text-muted);
+  font-family: var(--ui-font-sans);
+  font-size: 13px;
+  font-weight: 750;
+}
 .lg-react-axis { stroke: var(--ui-border-strong); stroke-width: 2; }
 .lg-react-tick { stroke: var(--ui-border-strong); stroke-width: 1.5; }
 .lg-react-distance { stroke: var(--ui-accent-alt); stroke-linecap: round; stroke-width: 5; }
@@ -11,10 +92,126 @@
 .lg-react-prediction-control, .lg-react-prediction-control * { cursor: grab; outline: none; }
 .lg-react-prediction-control.is-dragging, .lg-react-prediction-control.is-dragging * { cursor: grabbing; }
 .lg-react-prediction-control:focus-visible .lg-react-prediction { stroke: var(--ui-accent); stroke-width: 4; }
-.lg-react-value-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.lg-react-chart { overflow: hidden; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md); }
+
+.lg-react-value-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.lg-react-value-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.lg-react-chart {
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+}
+
+.lg-react-formula-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.lg-react-formula-grid .edu-formula-block { width: 100%; }
+
+.lg-react-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+}
+.lg-react-data-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  background: #fff;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.lg-react-data-table caption {
+  border-bottom: 1px solid var(--ui-border);
+  background: var(--ui-bg-muted);
+  padding: 10px 14px;
+  color: var(--ui-text-main);
+  font-size: 13px;
+  font-weight: 900;
+  text-align: left;
+}
+.lg-react-data-table th,
+.lg-react-data-table td {
+  border-bottom: 1px solid var(--ui-border);
+  padding: 11px 12px;
+  color: var(--ui-text-main);
+  font-size: 13px;
+}
+.lg-react-data-table thead th {
+  background: var(--ui-bg-soft);
+  color: var(--ui-accent);
+  font-weight: 900;
+}
+.lg-react-data-table tbody tr:last-child th,
+.lg-react-data-table tbody tr:last-child td { border-bottom: 0; }
+
+.lg-react-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.lg-react-experiment {
+  display: grid;
+  gap: 14px;
+}
+.lg-react-extension-body {
+  display: grid;
+  gap: 14px;
+}
+
+.lg-react-outlier-chart {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: #fff;
+}
+
 .lg-react-gradient-step { display: grid; gap: 12px; padding-top: 4px; }
-.lg-react-gradient-step + .lg-react-gradient-step { border-top: 1px solid var(--ui-border); padding-top: 22px; }
-.lg-react-gradient-step h3 { margin: 0; color: var(--ui-accent); font-size: 17px; }
+.lg-react-gradient-step + .lg-react-gradient-step {
+  border-top: 1px solid var(--ui-border);
+  padding-top: 22px;
+}
+.lg-react-gradient-step h3,
+.lg-react-probability-grid h3 {
+  margin: 0;
+  color: var(--ui-accent);
+  font-size: 17px;
+  line-height: 1.4;
+  text-wrap: balance;
+}
 
+.lg-react-extension { border-top-color: var(--ui-accent-alt); }
+.lg-react-probability-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.lg-react-probability-grid > section {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 12px;
+}
+.lg-react-probability-grid .edu-body {
+  max-width: 68ch;
+  text-wrap: pretty;
+}
 
+@media (max-width: 760px) {
+  .lg-react-value-grid,
+  .lg-react-value-grid--three,
+  .lg-react-formula-grid,
+  .lg-react-probability-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lg-react-course-note { align-items: flex-start; flex-direction: column; }
+  .lg-react-agenda li > div { align-items: flex-start; flex-direction: column; gap: 2px; }
+}

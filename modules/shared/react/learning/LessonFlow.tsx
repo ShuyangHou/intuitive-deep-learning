@@ -25,6 +25,8 @@ export interface LessonFlowProps {
   cueText?: ReactNode;
   /** Stable module-level key used to restore completed lesson steps after a revisit. */
   persistenceKey?: string;
+  /** Optional schema version that isolates progress while preserving the module id. */
+  persistenceVersion?: string;
 }
 
 interface LessonProgressState { completedIds?: string[]; visibleCount?: number; completed?: boolean; }
@@ -35,9 +37,10 @@ export function LessonFlow({
   className,
   cueText = '下一段内容已经准备好，向下滚动继续学习',
   persistenceKey,
+  persistenceVersion,
 }: LessonFlowProps) {
   const moduleKey = persistenceKey || 'lesson';
-  const progressKey = `lesson-flow:${moduleKey}`;
+  const progressKey = `lesson-flow:${moduleKey}${persistenceVersion ? `:${persistenceVersion}` : ''}`;
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [visibleCount, setVisibleCount] = useState(Math.min(1, steps.length));
   const [, setHydrated] = useState(false);

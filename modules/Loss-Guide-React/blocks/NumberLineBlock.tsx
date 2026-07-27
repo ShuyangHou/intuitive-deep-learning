@@ -4,6 +4,7 @@ import { ContentBlock } from '../../shared/react/layout/ContentBlock';
 import { NoticeStrip } from '../../shared/react/feedback/NoticeStrip';
 import { ValueTile } from '../../shared/react/learning/ValueTile';
 import { emitTelemetry, getTelemetryState } from '../../shared/react/telemetry';
+import { LOSS_GUIDE_MODULE_ID, lossGuideStateKey } from '../lessonConfig';
 
 export interface LessonBlockProps {
   onComplete: () => void;
@@ -13,7 +14,7 @@ const target = 7;
 const axisStart = 34;
 const axisEnd = 686;
 const axisWidth = axisEnd - axisStart;
-const predictionStateKey = 'control:number-line-prediction';
+const predictionStateKey = lossGuideStateKey('control:number-line-prediction');
 
 function clampPrediction(value: number) {
   return Math.min(10, Math.max(0, Math.round(value * 10) / 10));
@@ -26,8 +27,9 @@ export function NumberLineBlock({ onComplete }: LessonBlockProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const predictionRef = useRef(prediction);
   const solved = Math.abs(prediction - target) < 0.05;
-  const l1 = Math.abs(target - prediction);
-  const l2 = l1 ** 2;
+  const error = prediction - target;
+  const absolute = Math.abs(error);
+  const squared = error ** 2;
 
   useEffect(() => {
     if (solved) onComplete();
@@ -37,7 +39,7 @@ export function NumberLineBlock({ onComplete }: LessonBlockProps) {
 
   useEffect(() => {
     let active = true;
-    void getTelemetryState<{ value?: number }>(predictionStateKey, 'loss-guide-react').then((entry) => {
+    void getTelemetryState<{ value?: number }>(predictionStateKey, LOSS_GUIDE_MODULE_ID).then((entry) => {
       const restored = Number(entry?.state?.value);
       if (active && Number.isFinite(restored)) {
         setPrediction(clampPrediction(restored));
@@ -94,8 +96,8 @@ export function NumberLineBlock({ onComplete }: LessonBlockProps) {
   };
 
   return (
-    <ContentBlock className="lg-react-block" title="损失就是距离" subtitle="Loss 衡量真实值和预测值之间差多少。先用一条数轴，把这种差距直接画出来。">
-      <Callout tone="orange" label="你的任务" text="拖动绿色预测值，让它与红色真实值重合，把 Loss 缩小到 0。" />
+    <ContentBlock className="lg-react-block" title="先别急着定义：怎样量化一次预测偏差？" subtitle="同一个预测偏差可以保留方向，也可以只记录大小。先用一条数轴观察三种量如何同步变化。">
+      <Callout tone="orange" label="你的任务" text="拖动绿色预测值，观察有符号误差、绝对误差和平方误差；最后让预测与真实值重合。" />
       <div className="lg-react-numberline" aria-label="数轴距离演示">
         <svg ref={svgRef} viewBox="0 0 720 170" role="group" aria-label={`数轴互动：预测值 ${prediction.toFixed(1)}，真实值 ${target}`} onPointerMove={drag} onPointerUp={finishDrag} onPointerCancel={finishDrag} onLostPointerCapture={finishDrag}>
           <line x1={axisStart} y1="96" x2={axisEnd} y2="96" className="lg-react-axis" />
@@ -122,8 +124,14 @@ export function NumberLineBlock({ onComplete }: LessonBlockProps) {
           <text x={point} y="151" textAnchor="middle">预测值 {prediction.toFixed(1)}</text>
         </svg>
       </div>
-      <div className="lg-react-value-grid"><ValueTile tone="orange" label="L1 Loss = |真实值 - 预测值|" value={l1.toFixed(1)} /><ValueTile tone="blue" label="L2 Loss = (真实值 - 预测值)²" value={l2.toFixed(1)} /></div>
-      <NoticeStrip tone={solved ? 'green' : 'orange'} lead={solved ? '阶段完成：' : '操作提醒：'}>{solved ? '预测值已贴近真实值，Loss 变成 0。' : '拖动绿色预测值，让它贴近红色真实值。'}</NoticeStrip>
+      <div className="lg-react-value-grid lg-react-value-grid--three">
+        <ValueTile tone="danger" label="有符号误差 e = ŷ − y" value={error.toFixed(1)} />
+        <ValueTile tone="orange" label="绝对误差 |e|" value={absolute.toFixed(1)} />
+        <ValueTile tone="blue" label="平方误差 e²" value={squared.toFixed(1)} />
+      </div>
+      <NoticeStrip tone={solved ? 'green' : 'orange'} lead={solved ? '阶段完成：' : '操作提醒：'}>
+        {solved ? '预测值与真实值重合，三种误差都变成 0。接下来把观察写成数学定义。' : '拖动绿色预测值，比较距离减半时 |e| 和 e² 分别怎样变化。'}
+      </NoticeStrip>
     </ContentBlock>
   );
 }
