@@ -8,5 +8,5 @@ const videos = [
 ];
 
 export function ResourcesBlock() {
-  return <LessonFooter className="lg-react-block" title="继续你的学习旅程" description="你可以返回课程目录，或在准备好后继续前往下一步。" back={{ href: '../CourseMap/', label: '返回课程目录' }} next={{ href: '../Gradient-Descent-Module/', label: '学习下一课' }} videos={videos} />;
+  return <LessonFooter className="lg-react-block" title="继续你的学习旅程" description="你可以返回课程目录，或在准备好后继续前往下一步。" back={{ href: '../CourseMap/', label: '返回课程目录' }} next={{ href: '/modules/gradient-descent-module-react', label: '学习下一课' }} videos={videos} />;
 }

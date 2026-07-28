@@ -1,4 +1,16 @@
 import { ContentBlock, ModuleShell } from '../../modules/shared/react';
+import { ActivationCatalogBlock } from '../../modules/Activation-Func-Module-React/blocks/ActivationCatalogBlock';
+import { ApproximationBlock } from '../../modules/Activation-Func-Module-React/blocks/ApproximationBlock';
+import { DeepLinearBlock } from '../../modules/Activation-Func-Module-React/blocks/DeepLinearBlock';
+import { LinearConclusionBlock } from '../../modules/Activation-Func-Module-React/blocks/LinearConclusionBlock';
+import { Linear2DChoiceBlock, Linear3DChoiceBlock } from '../../modules/Activation-Func-Module-React/blocks/LinearChoiceBlocks';
+import { ReluIntroBlock } from '../../modules/Activation-Func-Module-React/blocks/ReluIntroBlock';
+import { ReluNetworkBlock } from '../../modules/Activation-Func-Module-React/blocks/ReluNetworkBlock';
+import { ShallowLinearBlock } from '../../modules/Activation-Func-Module-React/blocks/ShallowLinearBlock';
+import { AutoUpdateBlock } from '../../modules/Gradient-Descent-Module-React/blocks/AutoUpdateBlock';
+import { FullNetworkTrainingBlock } from '../../modules/Gradient-Descent-Module-React/blocks/FullNetworkTrainingBlock';
+import { ManualTuningBlock } from '../../modules/Gradient-Descent-Module-React/blocks/ManualTuningBlock';
+import { ResourcesBlock as GradientResourcesBlock } from '../../modules/Gradient-Descent-Module-React/blocks/ResourcesBlock';
 import { GradientBlock } from '../../modules/Loss-Guide-React/blocks/GradientBlock';
 import { LossCalculationBlock } from '../../modules/Loss-Guide-React/blocks/LossCalculationBlock';
 import { NumberLineBlock } from '../../modules/Loss-Guide-React/blocks/NumberLineBlock';
@@ -10,6 +22,13 @@ import { HyperparameterLessonFooter } from '../../modules/Hyperparameter-Module/
 import { GridSearchSimulationBlock } from '../../modules/Hyperparameter-Module/blocks/GridSearchSimulationBlock';
 import { RandomSearchSimulationBlock } from '../../modules/Hyperparameter-Module/blocks/RandomSearchSimulationBlock';
 import { BatchStepEpochBlock } from '../../modules/MISC_Module/blocks/BatchStepEpochBlock';
+import { MlpLabBlock } from '../../modules/MLP_playground-React/blocks/MlpLabBlock';
+import { MlpTransitionBlock } from '../../modules/MLP_playground-React/blocks/MlpTransitionBlock';
+import {
+  PersistedBoundaryChallengeBlock,
+  PersistedScenarioIntroBlock,
+} from '../../modules/MLP_playground-React/blocks/PersistedGuideBlocks';
+import { ResourcesBlock as MlpResourcesBlock } from '../../modules/MLP_playground-React/blocks/ResourcesBlock';
 import { BlockPreview } from './BlockPreview';
 import { UiKitPage } from '../../modules/shared/react/routing/UiKitPage';
 import { AppLink, type AppRoute } from './Router';
@@ -100,6 +119,86 @@ function BatchStepEpochPreview() {
   return <BlockPreview title="Batch、Step 与 Epoch">{({ complete }) => <BatchStepEpochBlock onComplete={complete} />}</BlockPreview>;
 }
 
+function GradientManualPreview() {
+  return <BlockPreview title="手动调整输出层权重">{({ complete }) => <ManualTuningBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function GradientAutoUpdatePreview() {
+  return <BlockPreview title="推导并执行梯度更新">{({ complete }) => <AutoUpdateBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function GradientFullNetworkPreview() {
+  return <BlockPreview title="让完整网络一起学习">{({ complete }) => <FullNetworkTrainingBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function GradientResourcesPreview() {
+  return <BlockPreview title="梯度下降推荐资源">{() => <GradientResourcesBlock />}</BlockPreview>;
+}
+
+function ActivationLinear2DPreview() {
+  return <BlockPreview title="线性定义与二维判断">{({ complete }) => <Linear2DChoiceBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function ActivationLinear3DPreview() {
+  return <BlockPreview title="三维线性判断">{({ complete }) => <Linear3DChoiceBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function ActivationShallowPreview() {
+  return <BlockPreview title="浅层线性网络">{({ complete }) => <ShallowLinearBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function ActivationDeepPreview() {
+  return <BlockPreview title="深层线性网络">{({ complete }) => <DeepLinearBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function ActivationLinearConclusionPreview() {
+  return <BlockPreview title="线性结论">{({ complete }) => <LinearConclusionBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function ActivationReluIntroPreview() {
+  return <BlockPreview title="单神经元 ReLU">{({ complete }) => <ReluIntroBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function ActivationReluNetworkPreview() {
+  return <BlockPreview title="多神经元 ReLU 网络">{({ complete }) => <ReluNetworkBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function ActivationApproximationPreview() {
+  return <BlockPreview title="曲线逼近">{({ complete }) => <ApproximationBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function ActivationCatalogPreview() {
+  return <BlockPreview title="激活函数与推荐资源">{() => <ActivationCatalogBlock />}</BlockPreview>;
+}
+
+function MlpScenarioPreview() {
+  return <BlockPreview title="个性化分类情境">{({ complete }) => <PersistedScenarioIntroBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function MlpBoundaryPreview() {
+  return <BlockPreview title="三关手绘分类边界">{({ complete }) => <PersistedBoundaryChallengeBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function MlpTransitionPreview() {
+  return <BlockPreview title="MLP 实验过渡">{({ complete }) => <MlpTransitionBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function MlpOneDimensionalPreview() {
+  return <BlockPreview title="1D MLP 实验">{({ complete }) => <MlpLabBlock dimension={1} onComplete={complete} />}</BlockPreview>;
+}
+
+function MlpTwoDimensionalPreview() {
+  return <BlockPreview title="2D MLP 实验">{({ complete }) => <MlpLabBlock dimension={2} onComplete={complete} />}</BlockPreview>;
+}
+
+function MlpThreeDimensionalPreview() {
+  return <BlockPreview title="3D MLP 实验">{({ complete }) => <MlpLabBlock dimension={3} onComplete={complete} />}</BlockPreview>;
+}
+
+function MlpResourcesPreview() {
+  return <BlockPreview title="MLP 推荐资源">{() => <MlpResourcesBlock />}</BlockPreview>;
+}
+
 export const appRoutes: AppRoute[] = [
   { path: '/', element: <HomePage /> },
   { path: '/shared/ui-kit', element: <UiKitPage /> },
@@ -115,4 +214,24 @@ export const appRoutes: AppRoute[] = [
   { path: '/dev/blocks/loss-guide-react/calculation', element: <CalculationPreview /> },
   { path: '/dev/blocks/loss-guide-react/gradient', element: <GradientPreview /> },
   { path: '/dev/blocks/loss-guide-react/resources', element: <ResourcesPreview /> },
+  { path: '/dev/blocks/gradient-descent-module-react/manual-tuning', element: <GradientManualPreview /> },
+  { path: '/dev/blocks/gradient-descent-module-react/auto-update', element: <GradientAutoUpdatePreview /> },
+  { path: '/dev/blocks/gradient-descent-module-react/full-network', element: <GradientFullNetworkPreview /> },
+  { path: '/dev/blocks/gradient-descent-module-react/resources', element: <GradientResourcesPreview /> },
+  { path: '/dev/blocks/activation-func-module-react/linear-2d', element: <ActivationLinear2DPreview /> },
+  { path: '/dev/blocks/activation-func-module-react/linear-3d', element: <ActivationLinear3DPreview /> },
+  { path: '/dev/blocks/activation-func-module-react/linear-shallow', element: <ActivationShallowPreview /> },
+  { path: '/dev/blocks/activation-func-module-react/linear-deep', element: <ActivationDeepPreview /> },
+  { path: '/dev/blocks/activation-func-module-react/linear-conclusion', element: <ActivationLinearConclusionPreview /> },
+  { path: '/dev/blocks/activation-func-module-react/relu-intro', element: <ActivationReluIntroPreview /> },
+  { path: '/dev/blocks/activation-func-module-react/relu-network', element: <ActivationReluNetworkPreview /> },
+  { path: '/dev/blocks/activation-func-module-react/approximation', element: <ActivationApproximationPreview /> },
+  { path: '/dev/blocks/activation-func-module-react/activation-catalog', element: <ActivationCatalogPreview /> },
+  { path: '/dev/blocks/mlp-playground-react/scenario-intro', element: <MlpScenarioPreview /> },
+  { path: '/dev/blocks/mlp-playground-react/boundary-challenge', element: <MlpBoundaryPreview /> },
+  { path: '/dev/blocks/mlp-playground-react/mlp-transition', element: <MlpTransitionPreview /> },
+  { path: '/dev/blocks/mlp-playground-react/mlp-1d', element: <MlpOneDimensionalPreview /> },
+  { path: '/dev/blocks/mlp-playground-react/mlp-2d', element: <MlpTwoDimensionalPreview /> },
+  { path: '/dev/blocks/mlp-playground-react/mlp-3d', element: <MlpThreeDimensionalPreview /> },
+  { path: '/dev/blocks/mlp-playground-react/resources', element: <MlpResourcesPreview /> },
 ];
