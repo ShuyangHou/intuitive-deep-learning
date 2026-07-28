@@ -19,6 +19,7 @@ export * from './controls/ExplainPanelButton';
 export * from './learning/Question';
 export * from './learning/ValueTile';
 export * from './learning/FormulaBlock';
+export * from './learning/MathFormulaBlock';
 export * from './learning/RelatedVideos';
 export * from './learning/LessonFooter';
 export * from './learning/PageRating';

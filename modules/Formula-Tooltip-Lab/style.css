@@ -1,0 +1,84 @@
+.ftl-formula-card {
+  width: min(100%, 1080px);
+  margin-inline: auto;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-bg-muted);
+  padding: clamp(24px, 4vw, 42px) clamp(16px, 3.4vw, 36px);
+}
+
+.ftl-formula {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  color: var(--ui-accent);
+  font-family: var(--ui-font-mono);
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 950;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.ftl-formula math-field {
+  display: inline-flex;
+  width: auto;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: currentColor;
+  font: inherit;
+  line-height: inherit;
+  outline: 0;
+  padding: 0;
+  pointer-events: none;
+  --caret-color: transparent;
+  --selection-background-color: transparent;
+  --contains-highlight-background-color: transparent;
+  --smart-fence-color: currentColor;
+}
+
+.ftl-static,
+.ftl-term {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  color: inherit;
+}
+
+.ftl-term {
+  position: relative;
+  cursor: help;
+  outline: none;
+}
+
+.ftl-term--warm {
+  color: var(--ui-accent-alt);
+}
+
+.ftl-term:focus-visible {
+  outline: 3px solid rgba(39, 68, 110, 0.25);
+  outline-offset: 5px;
+}
+
+.ftl-unavailable {
+  margin: 18px 0 0;
+  color: var(--ui-danger);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.dl-mathlive-unavailable .ftl-unavailable {
+  display: block;
+}
+
+@media (max-width: 760px) {
+  .ftl-formula {
+    flex-wrap: wrap;
+    column-gap: 0.08em;
+    row-gap: 0.2em;
+  }
+}

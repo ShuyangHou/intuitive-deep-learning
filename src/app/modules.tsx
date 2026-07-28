@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { DatasetSplitPage } from '../../modules/Dataset-Split-Module/DatasetSplitPage';
+import { FormulaTooltipPage } from '../../modules/Formula-Tooltip-React/FormulaTooltipPage';
 import { HyperparameterPage } from '../../modules/Hyperparameter-Module/HyperparameterPage';
 import { LossGuidePage } from '../../modules/Loss-Guide-React/LossGuidePage';
 import { MiscPage } from '../../modules/MISC_Module/MiscPage';
@@ -46,5 +47,13 @@ export const migratedModules: MigratedModule[] = [
     path: '/modules/loss-guide-react',
     badge: 'React 迁移版',
     element: <LossGuidePage />,
+  },
+  {
+    id: 'formula-tooltip-react',
+    title: 'LaTeX 公式拆解演示',
+    description: '用 MathLive 渲染训练目标函数，并为每个公式片段提供悬浮解释。',
+    path: '/modules/formula-tooltip-react',
+    badge: '公式实验模块',
+    element: <FormulaTooltipPage />,
   },
 ];

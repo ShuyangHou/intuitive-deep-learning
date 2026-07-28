@@ -1,5 +1,6 @@
 import { AppRouter } from './app/Router';
 import { appRoutes } from './app/routes';
+import '../modules/shared/vendor/mathlive/mathlive-fonts.css';
 import '../modules/shared/react/styles.css';
 import './app/app.css';
 
