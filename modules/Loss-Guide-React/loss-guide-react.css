@@ -99,6 +99,7 @@
   gap: 12px;
 }
 .lg-react-value-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.lg-react-value-grid--four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
 .lg-react-chart {
   overflow: hidden;
@@ -162,6 +163,16 @@
   display: grid;
   gap: 14px;
 }
+.lg-react-parameter-update,
+.lg-react-robust-loss {
+  display: grid;
+  gap: 14px;
+}
+.lg-react-control-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
 .lg-react-extension-body {
   display: grid;
   gap: 14px;
@@ -179,6 +190,7 @@
   padding-top: 22px;
 }
 .lg-react-gradient-step h3,
+.lg-react-derivation-step h3,
 .lg-react-probability-grid h3 {
   margin: 0;
   color: var(--ui-accent);
@@ -186,6 +198,21 @@
   line-height: 1.4;
   text-wrap: balance;
 }
+
+.lg-react-derivation-step {
+  display: grid;
+  gap: 12px;
+}
+.lg-react-derivation-step + .lg-react-derivation-step {
+  border-top: 1px solid var(--ui-border);
+  padding-top: 22px;
+}
+
+.lg-react-decision-table { min-width: 760px; }
+.lg-react-decision-table th:first-child,
+.lg-react-decision-table td:first-child,
+.lg-react-decision-table th:last-child,
+.lg-react-decision-table td:last-child { text-align: left; }
 
 .lg-react-extension { border-top-color: var(--ui-accent-alt); }
 .lg-react-probability-grid {
@@ -207,7 +234,9 @@
 @media (max-width: 760px) {
   .lg-react-value-grid,
   .lg-react-value-grid--three,
+  .lg-react-value-grid--four,
   .lg-react-formula-grid,
+  .lg-react-control-grid,
   .lg-react-probability-grid {
     grid-template-columns: 1fr;
   }

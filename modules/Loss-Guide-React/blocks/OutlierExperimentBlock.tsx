@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Callout, ContentBlock, EChartsChart, NoticeStrip, Question, ValueTile } from '../../shared/react';
+import { Button, Callout, ContentBlock, EChartsChart, NoticeStrip, Question, RangeControl, ValueTile } from '../../shared/react';
 import { emitTelemetry, getTelemetryState } from '../../shared/react/telemetry';
 import type { LessonBlockProps } from './NumberLineBlock';
 import { LOSS_GUIDE_MODULE_ID, lossGuideStateKey } from '../lessonConfig';
@@ -14,17 +14,20 @@ const regularSamples: LossSample[] = [
 ];
 const experimentStateKey = lossGuideStateKey('control:outlier-experiment');
 
-function buildSamples(hasOutlier: boolean): LossSample[] {
-  if (!hasOutlier) return regularSamples;
-  return regularSamples.map((sample) => sample.id === '5' ? { ...sample, prediction: 21 } : sample);
+function buildSamples(outlierPrediction: number): LossSample[] {
+  return regularSamples.map((sample) => sample.id === '5' ? { ...sample, prediction: outlierPrediction } : sample);
 }
 
 export function OutlierExperimentBlock({ onComplete }: LessonBlockProps) {
-  const [hasOutlier, setHasOutlier] = useState(false);
+  const [outlierPrediction, setOutlierPrediction] = useState(10);
   const [conclusionComplete, setConclusionComplete] = useState(false);
   const experimentRef = useRef<HTMLDivElement>(null);
-  const samples = useMemo(() => buildSamples(hasOutlier), [hasOutlier]);
+  const samples = useMemo(() => buildSamples(outlierPrediction), [outlierPrediction]);
   const metrics = calculateLossMetrics(samples);
+  const outlierError = Math.abs(outlierPrediction - 11);
+  const outlierMaeGradient = outlierError === 0 ? 0 : 1 / samples.length;
+  const outlierMseGradient = 2 * outlierError / samples.length;
+  const experimentReady = outlierError >= 8;
   const option = useMemo(() => ({
     animationDuration: 220,
     color: ['#f07e47', '#27446e'],
@@ -49,19 +52,23 @@ export function OutlierExperimentBlock({ onComplete }: LessonBlockProps) {
 
   useEffect(() => {
     let active = true;
-    void getTelemetryState<{ hasOutlier?: boolean }>(experimentStateKey, LOSS_GUIDE_MODULE_ID).then((entry) => {
-      if (active && typeof entry?.state?.hasOutlier === 'boolean') {
-        setHasOutlier(entry.state.hasOutlier);
+    void getTelemetryState<{ prediction?: number; hasOutlier?: boolean }>(experimentStateKey, LOSS_GUIDE_MODULE_ID).then((entry) => {
+      const restored = Number(entry?.state?.prediction);
+      if (active && Number.isFinite(restored)) {
+        setOutlierPrediction(Math.min(21, Math.max(10, restored)));
+      } else if (active && entry?.state?.hasOutlier === true) {
+        setOutlierPrediction(21);
       }
     });
     return () => { active = false; };
   }, []);
 
-  const updateExperiment = (next: boolean) => {
-    setHasOutlier(next);
+  const updateExperiment = (prediction: number) => {
+    const next = Math.min(21, Math.max(10, prediction));
+    setOutlierPrediction(next);
     emitTelemetry('control_commit', experimentRef.current, {
       state_key: experimentStateKey,
-      state: { hasOutlier: next },
+      state: { prediction: next },
       value: next,
     });
   };
@@ -70,7 +77,7 @@ export function OutlierExperimentBlock({ onComplete }: LessonBlockProps) {
     <ContentBlock
       className="lg-react-block"
       title="一个异常样本，能改变多少？"
-      subtitle="完成 reduction 后，损失函数的形状会决定大误差在整体目标中占据多大权重。"
+      subtitle="完成 reduction 后，损失函数的形状会决定大误差在整体目标和梯度中占据多大权重。"
     >
       <div ref={experimentRef} className="lg-react-experiment">
         <NoticeStrip tone="blue" lead="承接上一步：">
@@ -79,19 +86,30 @@ export function OutlierExperimentBlock({ onComplete }: LessonBlockProps) {
         <Callout
           tone="orange"
           label="控制变量实验"
-          text="基线中五个样本的误差绝对值都为 1。保持前四个样本不变，只把 S5 的预测从 10 改为 21，使它的误差绝对值从 1 增至 10。"
+          text="基线中五个样本的误差绝对值都为 1。保持前四个样本不变，逐步增大 S5 的预测值，观察整体损失和该样本梯度怎样变化。"
+        />
+        <RangeControl
+          label="S5 的预测值 ŷ₅"
+          min={10}
+          max={21}
+          step={1}
+          value={outlierPrediction}
+          hint
+          discrete
+          scale={['10：基线', '15', '21：强离群点']}
+          onChange={(event) => updateExperiment(Number(event.currentTarget.value))}
         />
         <div className="lg-react-actions" role="group" aria-label="离群点实验控制">
           <Button
             variant="primary"
-            hint={!hasOutlier}
-            active={hasOutlier}
-            aria-pressed={hasOutlier}
-            onClick={() => updateExperiment(true)}
+            hint={!experimentReady}
+            active={outlierPrediction === 21}
+            aria-pressed={outlierPrediction === 21}
+            onClick={() => updateExperiment(21)}
           >
-            引入离群点：S5 的 ŷ = 21
+            设置强离群点：ŷ₅ = 21
           </Button>
-          <Button disabled={!hasOutlier} onClick={() => updateExperiment(false)}>恢复普通样本</Button>
+          <Button disabled={outlierPrediction === 10} onClick={() => updateExperiment(10)}>恢复基线</Button>
         </div>
 
         <EChartsChart
@@ -99,30 +117,33 @@ export function OutlierExperimentBlock({ onComplete }: LessonBlockProps) {
           option={option}
           minHeight={330}
           role="img"
-          aria-label={hasOutlier ? '包含离群点时五个样本的绝对误差与平方误差柱状图' : '普通数据下五个样本的绝对误差与平方误差柱状图'}
+          aria-label={`S5 预测值为 ${outlierPrediction} 时，五个样本的绝对误差与平方误差柱状图`}
         />
 
-        <div className="lg-react-value-grid">
+        <div className="lg-react-value-grid lg-react-value-grid--four">
+          <ValueTile tone="danger" label="S5 的 |e|" value={outlierError.toFixed(1)} />
           <ValueTile tone="orange" label="当前 MAE" value={metrics.mae.toFixed(1)} />
           <ValueTile tone="blue" label="当前 MSE" value={metrics.mse.toFixed(1)} />
+          <ValueTile tone="blue" label="S5 的 |∂MSE/∂ŷ₅|" value={outlierMseGradient.toFixed(1)} />
         </div>
 
-        {hasOutlier ? (
+        {experimentReady ? (
           <>
             <NoticeStrip tone="orange" lead="观察结果：">
-              离群点让 MAE 从 1.0 增至 2.8，而 MSE 从 1.0 增至 20.8。平方让大误差获得了更高权重。
+              当 S5 的 |e| = {outlierError.toFixed(0)} 时，MAE 为 {metrics.mae.toFixed(1)}，MSE 为 {metrics.mse.toFixed(1)}。
+              该样本的 MAE 梯度绝对值为 {outlierMaeGradient.toFixed(1)}，MSE 梯度绝对值为 {outlierMseGradient.toFixed(1)}。
             </NoticeStrip>
             <Question
               persistenceKey={lossGuideStateKey('outlier-sensitivity')}
               type="judgement"
-              title="当数据可能含有标注错误或极端离群点时，MSE 通常比 MAE 更容易被单个异常样本支配。"
+              title="误差继续增大时，MSE 不仅比 MAE 增长更快，它对该样本预测值的梯度绝对值也会继续增大。"
               options={[
-                { key: '对', value: 'true', label: '正确，平方会放大大误差' },
-                { key: '错', value: 'false', label: '错误，两者受影响完全相同' },
+                { key: '对', value: 'true', label: '正确，MSE 损失和梯度都保留误差大小' },
+                { key: '错', value: 'false', label: '错误，两种梯度的绝对值始终相同' },
               ]}
               answer="true"
               feedback={{
-                correct: '正确。但这不代表 MAE 永远更好；选择仍取决于噪声假设和任务代价。下一步还要从梯度角度解释这种影响怎样进入模型更新。',
+                correct: '正确。但这不代表 MAE 永远更好；选择仍取决于噪声假设、优化性质和任务代价。',
               }}
               onCheck={(result) => {
                 setConclusionComplete(result.ok);
@@ -131,13 +152,13 @@ export function OutlierExperimentBlock({ onComplete }: LessonBlockProps) {
             />
             {conclusionComplete && (
               <NoticeStrip tone="blue" lead="从现象进入机制：">
-                现在只看到 MSE 的数值从 1.0 增至 20.8。模型训练真正使用的是损失对预测或参数的梯度，所以下一步要检查：大误差是否也会产生更强的更新信号？
+                MSE 不仅让整体损失增长更快，也让大误差样本产生更强的梯度。下一步将用求导解释这个更新信号，并继续追踪到模型参数。
               </NoticeStrip>
             )}
           </>
         ) : (
-          <NoticeStrip tone="blue" lead="基线状态：">
-            五个样本的误差绝对值都为 1，因此 MAE 与 MSE 都等于 1。
+          <NoticeStrip tone="blue" lead="继续拖动：">
+            当前 S5 的 |e| = {outlierError.toFixed(0)}。比较 MAE、MSE 和 MSE 梯度的变化速度；达到 |e| ≥ 8 后再作判断。
           </NoticeStrip>
         )}
       </div>

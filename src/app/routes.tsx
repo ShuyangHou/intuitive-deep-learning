@@ -5,8 +5,10 @@ import { LossCalculationBlock } from '../../modules/Loss-Guide-React/blocks/Loss
 import { LossChoiceBlock } from '../../modules/Loss-Guide-React/blocks/LossChoiceBlock';
 import { NumberLineBlock } from '../../modules/Loss-Guide-React/blocks/NumberLineBlock';
 import { OutlierExperimentBlock } from '../../modules/Loss-Guide-React/blocks/OutlierExperimentBlock';
+import { ParameterUpdateBlock } from '../../modules/Loss-Guide-React/blocks/ParameterUpdateBlock';
 import { ProbabilityExtensionBlock } from '../../modules/Loss-Guide-React/blocks/ProbabilityExtensionBlock';
 import { ResourcesBlock } from '../../modules/Loss-Guide-React/blocks/ResourcesBlock';
+import { RobustLossBlock } from '../../modules/Loss-Guide-React/blocks/RobustLossBlock';
 import { DatasetLessonFooter } from '../../modules/Dataset-Split-Module/blocks/DatasetLessonFooter';
 import { DatasetSplitProcessBlock } from '../../modules/Dataset-Split-Module/blocks/DatasetSplitProcessBlock';
 import { HyperparameterOverviewBlock } from '../../modules/Hyperparameter-Module/blocks/HyperparameterOverviewBlock';
@@ -32,6 +34,8 @@ const blockPreviews = [
   { id: 'loss-dataset-reduction', group: '损失函数导览', title: '数据集 reduction', description: '从单样本损失汇总为批次训练目标。', path: '/dev/blocks/loss-guide-react/dataset-reduction' },
   { id: 'loss-outlier-experiment', group: '损失函数导览', title: '离群点实验', description: '比较 MAE 与 MSE 对异常样本的敏感性。', path: '/dev/blocks/loss-guide-react/outlier-experiment' },
   { id: 'loss-gradient', group: '损失函数导览', title: 'L1 与 L2 梯度', description: '独立调试梯度比较教学块。', path: '/dev/blocks/loss-guide-react/gradient' },
+  { id: 'loss-parameter-update', group: '损失函数导览', title: '参数更新', description: '用链式法则把预测梯度传递到线性模型参数。', path: '/dev/blocks/loss-guide-react/parameter-update' },
+  { id: 'loss-robust-loss', group: '损失函数导览', title: 'Huber 稳健损失', description: '探索二次区间与线性尾部之间的平滑折中。', path: '/dev/blocks/loss-guide-react/robust-loss' },
   { id: 'loss-choice', group: '损失函数导览', title: '损失函数选择', description: '根据噪声结构与任务代价选择损失函数。', path: '/dev/blocks/loss-guide-react/loss-choice' },
   { id: 'loss-probability-extension', group: '损失函数导览', title: '概率解释拓展', description: '连接噪声分布、最大似然与损失函数。', path: '/dev/blocks/loss-guide-react/probability-extension' },
   { id: 'loss-resources', group: '损失函数导览', title: '推荐资源', description: '独立调试课程结尾与推荐资源。', path: '/dev/blocks/loss-guide-react/resources' },
@@ -74,6 +78,14 @@ function CalculationPreview() {
 
 function GradientPreview() {
   return <BlockPreview title="MAE 与 MSE 梯度">{({ complete }) => <GradientBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function ParameterUpdatePreview() {
+  return <BlockPreview title="从预测梯度到参数更新">{({ complete }) => <ParameterUpdateBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function RobustLossPreview() {
+  return <BlockPreview title="Huber 稳健损失">{({ complete }) => <RobustLossBlock onComplete={complete} />}</BlockPreview>;
 }
 
 function DatasetReductionPreview() {
@@ -140,6 +152,8 @@ export const appRoutes: AppRoute[] = [
   { path: '/dev/blocks/loss-guide-react/dataset-reduction', element: <DatasetReductionPreview /> },
   { path: '/dev/blocks/loss-guide-react/outlier-experiment', element: <OutlierExperimentPreview /> },
   { path: '/dev/blocks/loss-guide-react/gradient', element: <GradientPreview /> },
+  { path: '/dev/blocks/loss-guide-react/parameter-update', element: <ParameterUpdatePreview /> },
+  { path: '/dev/blocks/loss-guide-react/robust-loss', element: <RobustLossPreview /> },
   { path: '/dev/blocks/loss-guide-react/loss-choice', element: <LossChoicePreview /> },
   { path: '/dev/blocks/loss-guide-react/probability-extension', element: <ProbabilityExtensionPreview /> },
   { path: '/dev/blocks/loss-guide-react/resources', element: <ResourcesPreview /> },

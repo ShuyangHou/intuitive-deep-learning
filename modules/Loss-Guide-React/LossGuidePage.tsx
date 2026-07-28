@@ -6,8 +6,10 @@ import { GradientBlock } from './blocks/GradientBlock';
 import { LossChoiceBlock } from './blocks/LossChoiceBlock';
 import { NumberLineBlock } from './blocks/NumberLineBlock';
 import { OutlierExperimentBlock } from './blocks/OutlierExperimentBlock';
+import { ParameterUpdateBlock } from './blocks/ParameterUpdateBlock';
 import { ProbabilityExtensionBlock } from './blocks/ProbabilityExtensionBlock';
 import { ResourcesBlock } from './blocks/ResourcesBlock';
+import { RobustLossBlock } from './blocks/RobustLossBlock';
 import { LOSS_GUIDE_MODULE_ID, LOSS_GUIDE_PROGRESS_VERSION, lossGuideLessonPlan } from './lessonConfig';
 
 const steps: LessonFlowStep[] = [
@@ -16,6 +18,8 @@ const steps: LessonFlowStep[] = [
   { id: 'dataset-reduction', revealMode: 'scroll', render: ({ complete }) => <DatasetReductionBlock onComplete={complete} /> },
   { id: 'outlier-experiment', revealMode: 'scroll', render: ({ complete }) => <OutlierExperimentBlock onComplete={complete} /> },
   { id: 'gradient', revealMode: 'scroll', render: ({ complete }) => <GradientBlock onComplete={complete} /> },
+  { id: 'parameter-update', revealMode: 'scroll', render: ({ complete }) => <ParameterUpdateBlock onComplete={complete} /> },
+  { id: 'robust-loss', revealMode: 'scroll', render: ({ complete }) => <RobustLossBlock onComplete={complete} /> },
   { id: 'loss-choice', revealMode: 'scroll', completesLesson: true, render: ({ complete }) => <LossChoiceBlock onComplete={complete} /> },
   { id: 'probability-extension', revealMode: 'scroll', render: ({ complete }) => <ProbabilityExtensionBlock onComplete={complete} /> },
   { id: 'resources', revealMode: 'immediate', render: () => <ResourcesBlock /> },

@@ -12,7 +12,7 @@ export function ResourcesBlock() {
     <LessonFooter
       className="lg-react-block"
       title="把损失交给梯度下降"
-      description="你已经完成从单样本误差、数据集 reduction、离群点影响到梯度与概率假设的推理链。下一课将观察参数怎样沿负梯度方向更新。"
+      description="你已经完成从单样本误差、数据集 reduction、离群点影响，到参数梯度、Huber 稳健折中与概率假设的完整推理链。下一课将把这些更新规则放进梯度下降的迭代过程。"
       back={{ href: '../CourseMap/', label: '返回课程目录' }}
       next={{ href: '../Gradient-Descent-Module/', label: '学习梯度下降' }}
       videos={videos}
