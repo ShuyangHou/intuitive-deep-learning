@@ -11,12 +11,12 @@ export function GradientBlock({ onComplete }: LessonBlockProps) {
     <ContentBlock
       className="lg-react-block"
       title="梯度怎样把损失变成更新信号？"
-      subtitle="损失是一个标量；梯度描述预测值发生微小变化时，损失上升最快的方向和变化率。训练时沿负梯度方向更新。"
+      subtitle="上一环节看到离群点显著放大了 MSE；现在通过求导追踪这种数值差异怎样变成模型的更新信号。"
     >
       <Callout
         tone="blue"
-        label="符号方向"
-        text="梯度为正表示增大 ŷ 会让损失上升，因此梯度下降会减小 ŷ；梯度为负时则相反。"
+        label="承接离群点实验"
+        text="损失数值说明整体目标改变了多少，梯度才决定下一步怎样更新。比较绝对误差的固定梯度与 MSE 中随误差增大的梯度，就能解释异常样本为什么可能主导训练。"
       />
 
       <section className="lg-react-gradient-step">

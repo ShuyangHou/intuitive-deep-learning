@@ -101,7 +101,9 @@ export function DatasetReductionBlock({ onComplete }: LessonBlockProps) {
               { key: '错', value: 'false', label: '不可以，抵消会掩盖真实偏差' },
             ]}
             answer="false"
-            feedback={{ correct: '正确。绝对值或平方会阻止正负误差互相抵消。' }}
+            feedback={{
+              correct: '正确。绝对值或平方会阻止正负误差互相抵消。接下来保持 reduction 方式不变，只放大一个样本的误差，观察它能在多大程度上改变整体损失。',
+            }}
             onCheck={(result) => {
               if (result.ok) onComplete();
             }}

@@ -21,6 +21,7 @@ function buildSamples(hasOutlier: boolean): LossSample[] {
 
 export function OutlierExperimentBlock({ onComplete }: LessonBlockProps) {
   const [hasOutlier, setHasOutlier] = useState(false);
+  const [conclusionComplete, setConclusionComplete] = useState(false);
   const experimentRef = useRef<HTMLDivElement>(null);
   const samples = useMemo(() => buildSamples(hasOutlier), [hasOutlier]);
   const metrics = calculateLossMetrics(samples);
@@ -69,13 +70,16 @@ export function OutlierExperimentBlock({ onComplete }: LessonBlockProps) {
     <ContentBlock
       className="lg-react-block"
       title="一个异常样本，能改变多少？"
-      subtitle="损失函数不仅衡量误差，也决定每个样本在训练中拥有多大的影响力。"
+      subtitle="完成 reduction 后，损失函数的形状会决定大误差在整体目标中占据多大权重。"
     >
       <div ref={experimentRef} className="lg-react-experiment">
+        <NoticeStrip tone="blue" lead="承接上一步：">
+          MAE 和 MSE 都能避免正负误差抵消，但它们对大误差的放大程度不同。下面保持样本数和 reduction 方式不变，只改变一个预测值。
+        </NoticeStrip>
         <Callout
           tone="orange"
-          label="反事实实验"
-          text="保持前四个样本不变，把第 5 个预测改成明显异常的数值。比较 MAE 与 MSE 对同一个离群点的反应。"
+          label="控制变量实验"
+          text="基线中五个样本的误差绝对值都为 1。保持前四个样本不变，只把 S5 的预测从 10 改为 21，使它的误差绝对值从 1 增至 10。"
         />
         <div className="lg-react-actions" role="group" aria-label="离群点实验控制">
           <Button
@@ -117,11 +121,19 @@ export function OutlierExperimentBlock({ onComplete }: LessonBlockProps) {
                 { key: '错', value: 'false', label: '错误，两者受影响完全相同' },
               ]}
               answer="true"
-              feedback={{ correct: '正确。但这不代表 MAE 永远更好；选择仍取决于噪声假设和任务代价。' }}
+              feedback={{
+                correct: '正确。但这不代表 MAE 永远更好；选择仍取决于噪声假设和任务代价。下一步还要从梯度角度解释这种影响怎样进入模型更新。',
+              }}
               onCheck={(result) => {
+                setConclusionComplete(result.ok);
                 if (result.ok) onComplete();
               }}
             />
+            {conclusionComplete && (
+              <NoticeStrip tone="blue" lead="从现象进入机制：">
+                现在只看到 MSE 的数值从 1.0 增至 20.8。模型训练真正使用的是损失对预测或参数的梯度，所以下一步要检查：大误差是否也会产生更强的更新信号？
+              </NoticeStrip>
+            )}
           </>
         ) : (
           <NoticeStrip tone="blue" lead="基线状态：">
