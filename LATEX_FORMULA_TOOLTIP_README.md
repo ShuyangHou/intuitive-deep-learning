@@ -47,6 +47,9 @@ React 模块适合作为后续新模块或 `Loss-Guide-React` 继续扩展公式
 - `modules/shared/mathlive-loader.js`
   - 静态 HTML 模块使用的 MathLive 动态加载器。
   - 从本地 `modules/shared/vendor/mathlive/mathlive.min.mjs` 加载 MathLive。
+- `modules/shared/react/styles.css`
+  - develop 体系的统一设计系统样式。
+  - 静态公式演示页也直接复用它，不再依赖已移除的旧 `base.css` 和 `module-components.css`。
 - `modules/shared/vendor/mathlive/`
   - 本地 vendor 化的 MathLive 包资源。
   - 包含 `mathlive.min.mjs`、`mathlive-fonts.css`、字体文件等。
@@ -109,14 +112,21 @@ React 模块适合作为后续新模块或 `Loss-Guide-React` 继续扩展公式
 <link rel="stylesheet" href="../shared/vendor/mathlive/mathlive-fonts.css">
 ```
 
-### 2. 引入共享 tooltip 和 MathLive loader
+### 2. 引入 develop 共享样式和 MathLive loader
+
+在 `<head>` 中加入：
+
+```html
+<link rel="stylesheet" href="../shared/react/styles.css">
+```
 
 在页面底部加入：
 
 ```html
-<script src="../shared/module-components.js"></script>
 <script src="../shared/mathlive-loader.js"></script>
 ```
+
+静态公式模块的 tooltip 由模块自身的 CSS/JS 提供，不依赖旧的 `module-components.js`。
 
 ### 3. 插入可解释公式片段
 
@@ -281,6 +291,13 @@ http://127.0.0.1:5173/modules/formula-tooltip-react
 ```text
 http://127.0.0.1:5173/modules/Formula-Tooltip-Lab/
 ```
+
+静态模块检查项：
+
+1. 公式应以专业排版显示，而不是显示 LaTeX 源码。
+2. 悬浮 `W*`、`arg min`、`Loss`、`ŷ`、`λ`、`||W||₂²` 时，应显示对应解释。
+3. 点击任一公式片段后，解释应保持显示；点击空白处或按 `Escape` 应关闭解释。
+4. 用 `Tab` 聚焦公式片段时，也应显示解释。
 
 类型检查：
 

@@ -62,6 +62,67 @@
   outline-offset: 5px;
 }
 
+.ftl-term::before,
+.ftl-term::after {
+  position: absolute;
+  left: 50%;
+  z-index: 30;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+}
+
+.ftl-term::before {
+  top: calc(100% + 5px);
+  width: 10px;
+  height: 10px;
+  background: var(--ui-text-main);
+  content: "";
+  transform: translate(-50%, -4px) rotate(45deg);
+}
+
+.ftl-term::after {
+  top: calc(100% + 10px);
+  width: max-content;
+  max-width: min(270px, calc(100vw - 56px));
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-text-main);
+  box-shadow: 0 12px 28px rgba(25, 42, 70, 0.2);
+  color: #fff;
+  content: attr(data-dl-explain);
+  padding: 9px 11px;
+  font-family: var(--ui-font-sans);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+  text-align: left;
+  white-space: normal;
+  transform: translate(-50%, -4px);
+}
+
+.ftl-term:hover::before,
+.ftl-term:hover::after,
+.ftl-term:focus-visible::before,
+.ftl-term:focus-visible::after,
+.ftl-term.is-explaining::before,
+.ftl-term.is-explaining::after {
+  visibility: visible;
+  opacity: 1;
+}
+
+.ftl-term:hover::before,
+.ftl-term:focus-visible::before,
+.ftl-term.is-explaining::before {
+  transform: translate(-50%, 0) rotate(45deg);
+}
+
+.ftl-term:hover::after,
+.ftl-term:focus-visible::after,
+.ftl-term.is-explaining::after {
+  transform: translate(-50%, 0);
+}
+
 .ftl-unavailable {
   margin: 18px 0 0;
   color: var(--ui-danger);
