@@ -10,12 +10,28 @@ import { HyperparameterLessonFooter } from '../../modules/Hyperparameter-Module/
 import { GridSearchSimulationBlock } from '../../modules/Hyperparameter-Module/blocks/GridSearchSimulationBlock';
 import { RandomSearchSimulationBlock } from '../../modules/Hyperparameter-Module/blocks/RandomSearchSimulationBlock';
 import { BatchStepEpochBlock } from '../../modules/MISC_Module/blocks/BatchStepEpochBlock';
+import { DropoutBlock } from '../../modules/Fitting_Module/blocks/DropoutBlock';
+import { FittingDiagnosisBlock } from '../../modules/Fitting_Module/blocks/FittingDiagnosisBlock';
+import { FittingLessonFooter } from '../../modules/Fitting_Module/blocks/FittingLessonFooter';
+import { WeightRegularizationBlock } from '../../modules/Fitting_Module/blocks/WeightRegularizationBlock';
+import { SgdFoundationBlock } from '../../modules/Adaptive-Learning-Rate-Module/blocks/SgdFoundationBlock';
+import { AdaGradBlock } from '../../modules/Adaptive-Learning-Rate-Module/blocks/AdaGradBlock';
+import { AdamBlock } from '../../modules/Adaptive-Learning-Rate-Module/blocks/AdamBlock';
+import { AdaptiveLearningRateLessonFooter } from '../../modules/Adaptive-Learning-Rate-Module/blocks/AdaptiveLearningRateLessonFooter';
 import { BlockPreview } from './BlockPreview';
 import { UiKitPage } from '../../modules/shared/react/routing/UiKitPage';
 import { AppLink, type AppRoute } from './Router';
 import { migratedModules } from './modules';
 
 const blockPreviews = [
+  { id: 'adaptive-lr-sgd', group: '自适应学习率', title: 'SGD 基础', description: '用碗形损失曲线理解梯度方向、学习率与一步参数更新。', path: '/dev/blocks/adaptive-learning-rate/sgd' },
+  { id: 'adaptive-lr-adagrad', group: '自适应学习率', title: 'AdaGrad', description: '观察历史平方梯度如何为每个参数缩放有效学习率。', path: '/dev/blocks/adaptive-learning-rate/adagrad' },
+  { id: 'adaptive-lr-adam', group: '自适应学习率', title: 'Adam', description: '在噪声梯度序列中比较原始梯度、方向记忆与自适应更新量。', path: '/dev/blocks/adaptive-learning-rate/adam' },
+  { id: 'adaptive-lr-ending', group: '自适应学习率', title: '课程结尾', description: '回顾 SGD、AdaGrad 与 Adam 的演化主线。', path: '/dev/blocks/adaptive-learning-rate/ending' },
+  { id: 'fitting-diagnosis', group: '拟合与泛化', title: '辨别欠拟合与过拟合', description: '观察训练与验证曲线，标记过拟合开始位置。', path: '/dev/blocks/fitting/diagnosis' },
+  { id: 'fitting-weight-regularization', group: '拟合与泛化', title: '权重正则化', description: '理解小权重为何更稳定，以及正则项如何缓解过拟合。', path: '/dev/blocks/fitting/weight-regularization' },
+  { id: 'fitting-dropout', group: '拟合与泛化', title: 'Dropout', description: '观察每次训练如何用新的随机 Mask 屏蔽部分激活。', path: '/dev/blocks/fitting/dropout' },
+  { id: 'fitting-ending', group: '拟合与泛化', title: '课程结尾', description: '拟合与泛化课程完成状态及延伸视频。', path: '/dev/blocks/fitting/ending' },
   { id: 'misc-batch-step-epoch', group: '基础概念', title: 'Batch、Step 与 Epoch', description: '理解批次、参数更新次数与完整训练轮次。', path: '/dev/blocks/misc/batch-step-epoch' },
   { id: 'hyperparameter-overview', group: '超参数与超参数搜索', title: '超参数', description: '参数与超参数、常见超参数滑杆及单选题。', path: '/dev/blocks/hyperparameter/overview' },
   { id: 'hyperparameter-grid-search', group: '超参数与超参数搜索', title: '网格搜索', description: '运行学习率与权重衰减的二维网格搜索。', path: '/dev/blocks/hyperparameter/grid-search' },
@@ -100,10 +116,50 @@ function BatchStepEpochPreview() {
   return <BlockPreview title="Batch、Step 与 Epoch">{({ complete }) => <BatchStepEpochBlock onComplete={complete} />}</BlockPreview>;
 }
 
+function FittingDiagnosisPreview() {
+  return <BlockPreview title="辨别欠拟合与过拟合">{({ complete }) => <FittingDiagnosisBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function WeightRegularizationPreview() {
+  return <BlockPreview title="权重正则化">{({ complete }) => <WeightRegularizationBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function DropoutPreview() {
+  return <BlockPreview title="Dropout">{({ complete }) => <DropoutBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function FittingEndingPreview() {
+  return <BlockPreview title="课程结尾">{() => <FittingLessonFooter />}</BlockPreview>;
+}
+
+function SgdFoundationPreview() {
+  return <BlockPreview title="SGD 基础">{({ complete }) => <SgdFoundationBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function AdaGradPreview() {
+  return <BlockPreview title="AdaGrad">{({ complete }) => <AdaGradBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function AdamPreview() {
+  return <BlockPreview title="Adam">{({ complete }) => <AdamBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function AdaptiveLearningRateEndingPreview() {
+  return <BlockPreview title="课程结尾">{() => <AdaptiveLearningRateLessonFooter />}</BlockPreview>;
+}
+
 export const appRoutes: AppRoute[] = [
   { path: '/', element: <HomePage /> },
   { path: '/shared/ui-kit', element: <UiKitPage /> },
   ...migratedModules.map(({ path, element }) => ({ path, element })),
+  { path: '/dev/blocks/adaptive-learning-rate/sgd', element: <SgdFoundationPreview /> },
+  { path: '/dev/blocks/adaptive-learning-rate/adagrad', element: <AdaGradPreview /> },
+  { path: '/dev/blocks/adaptive-learning-rate/adam', element: <AdamPreview /> },
+  { path: '/dev/blocks/adaptive-learning-rate/ending', element: <AdaptiveLearningRateEndingPreview /> },
+  { path: '/dev/blocks/fitting/diagnosis', element: <FittingDiagnosisPreview /> },
+  { path: '/dev/blocks/fitting/weight-regularization', element: <WeightRegularizationPreview /> },
+  { path: '/dev/blocks/fitting/dropout', element: <DropoutPreview /> },
+  { path: '/dev/blocks/fitting/ending', element: <FittingEndingPreview /> },
   { path: '/dev/blocks/misc/batch-step-epoch', element: <BatchStepEpochPreview /> },
   { path: '/dev/blocks/hyperparameter/overview', element: <DatasetHyperparametersPreview /> },
   { path: '/dev/blocks/hyperparameter/grid-search', element: <HyperparameterGridSearchPreview /> },

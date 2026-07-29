@@ -104,11 +104,11 @@ export function GridSearchSimulationBlock({ onComplete }: GridSearchSimulationBl
   };
 
   return (
-    <ContentBlock className="hp-block hp-grid-block" title="超参数寻优挑战" subtitle="探索学习率与权重衰减的组合，用更少的实验逼近最佳验证性能。">
-      <NoticeStrip tone="blue" className="hp-sweeper-notice" lead="注意：">真实性能会有局部波动，不一定沿某个方向持续变好。结束搜索后，再比较你找到的结果与全局最高性能。</NoticeStrip>
+    <ContentBlock className="hp-block hp-grid-block" title="找到更好的超参数组合" subtitle="不同组合可能产生不同效果，我们需要通过实验寻找更好的方案。">
+      <NoticeStrip tone="blue" className="hp-sweeper-notice" lead="网格搜索：">当候选范围有限时，可以遍历所有可能组合，并比较验证集性能。但是，随着超参数数量增加，组合数量会快速增长。</NoticeStrip>
       <section className="hp-sweeper-toolbar">
         <div><span>当前实验次数</span><strong>{attempts}</strong></div>
-        <div><span>{solved ? '与最高性能差距' : '当前最好性能'}</span><strong>{bestRevealed ? solved ? `${finalGap.toFixed(1)}%` : `${bestRevealed.score.toFixed(1)}%` : '—'}</strong></div>
+        <div><span>{solved ? '与最好结果的差距' : '目前最好的结果'}</span><strong>{bestRevealed ? solved ? `${finalGap.toFixed(1)}%` : `${bestRevealed.score.toFixed(1)}%` : '—'}</strong></div>
         {solved && <div className="hp-sweeper-score"><span>游戏得分</span><strong>{gameScore}<small> 分</small></strong></div>}
         {!solved && <Button variant="primary" disabled={runningId !== null || attempts === 0} onClick={finish}>结束搜索</Button>}
         {solved && <Button onClick={reset}>重新开始</Button>}
@@ -138,35 +138,35 @@ export function GridSearchSimulationBlock({ onComplete }: GridSearchSimulationBl
       </section>
 
       <div className="hp-sweeper-guide">
-        <span>从任意格开始</span><i>→</i><span>比较相邻性能</span><i>→</i><span>在合适时结束搜索</span>
+        <span>选择一个组合</span><i>→</i><span>比较实验结果</span><i>→</i><span>决定何时停止</span>
       </div>
       {solved && <Question
         persistenceKey="grid-search-conditional-optimum-v2"
         type="choice"
-        title="在一次超参数搜索中，你固定模型结构，通过搜索找到了验证集性能最好的 lr 与 wd 组合。之后，你改变了其他超参数设置。关于原来的 lr 与 wd 组合，以下说法正确的是："
+        title="你在固定模型结构时，比较后找到了效果最好的 lr 与 wd 组合。之后又改了其他超参数，原来的组合该怎样处理？"
         options={[
-          { key: 'A', value: 'still-optimal', label: '原来的 lr 与 wd 组合仍然一定最优，因为它们已经经过搜索验证', wrongFeedback: '原结论只在当时固定的其他设置下成立；条件变化后，“最优”没有保证。' },
-          { key: 'B', value: 'independent', label: '原来的 lr 与 wd 组合可以直接沿用，因为不同超参数之间相互独立', wrongFeedback: '超参数并不相互独立，例如 Batch Size 会改变合适的学习率范围。' },
+          { key: 'A', value: 'still-optimal', label: '可以直接沿用，因为它已经在上一次比较中效果最好', wrongFeedback: '上一次的结论只适用于当时其他设置不变的情况；条件变了，效果也可能改变。' },
+          { key: 'B', value: 'independent', label: '可以直接沿用，因为不同超参数彼此不会影响', wrongFeedback: '超参数会共同影响训练，例如 Batch Size 变化后，合适的学习率范围也可能变化。' },
           { key: 'C', value: 'revalidate', label: '需要在新的超参数设置下重新比较 lr 与 wd，因为超参数之间可能存在相互影响' },
-          { key: 'D', value: 'changed-only', label: '只需要调整发生变化的超参数，其他超参数无需重新评估', wrongFeedback: '一个超参数变化后，原有组合的验证表现也可能改变，因此相关参数需要重新比较。' },
+          { key: 'D', value: 'changed-only', label: '只要调整刚刚改动的那个超参数，其他选择不需要再看', wrongFeedback: '一个选择变化后，原来组合的效果也可能改变，因此相关设置需要重新比较。' },
         ]}
         answer="revalidate"
         feedback={{
-          correct: '正确。当前 lr 与 wd 的表现以其他超参数固定为前提；Batch Size 或模型结构变化后，性能地形和最优组合都可能改变。',
-          wrong: 'lr、wd 会与 Batch Size、模型结构等设置共同影响训练。其他设置变化后，需要重新验证原组合是否仍然合适。',
+          correct: '正确。当前 lr 与 wd 的效果以其他设置不变为前提；Batch Size 或模型结构变化后，原来的组合也需要重新比较。',
+          wrong: 'lr、wd 会和 Batch Size、模型结构等设置一起影响训练。其他设置变化后，需要重新比较原来的组合是否仍然合适。',
         }}
         onCheck={(result) => { if (result.ok) setConditionalAnswerCorrect(true); }}
       />}
       {solved && conditionalAnswerCorrect && <Question
         persistenceKey="grid-search-combinations-v1"
         type="fill"
-        title="网格搜索要调整 3 个超参数，每个超参数都有 5 个候选值，共需训练 ____ 组组合。"
+        title="如果要比较 3 个超参数，每个都有 5 个候选值，一共需要尝试 ____ 种组合。"
         blanks={[{ label: '组合数量', placeholder: '填写次数' }]}
         answer="125"
         submitText="检查计算"
         feedback={{
-          correct: '正确。5 × 5 × 5 = 125，参数或候选值增加时，组合数量会迅速膨胀。',
-          wrong: '每一项候选值都要和另外两项的所有候选值组合：5 × 5 × 5。',
+          correct: '正确。5 × 5 × 5 = 125。超参数或候选值一多，需要比较的组合就会迅速增加。',
+          wrong: '每一个候选值都要和另外两项的所有候选值配对：5 × 5 × 5。',
         }}
         onCheck={(result) => { if (result.ok) onComplete?.(); }}
       />}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, ContentBlock, PlotlyChart, Question, RangeControl, Select, type PlotlyLayout, type PlotlyTrace } from '../../shared/react';
+import { Button, Callout, ContentBlock, NoticeStrip, PlotlyChart, Question, RangeControl, Select, type PlotlyLayout, type PlotlyTrace } from '../../shared/react';
 
 interface RandomSearchSimulationBlockProps { onComplete?: () => void; }
 type ParameterKey = 'learningRate' | 'weightDecay' | 'dropout';
@@ -15,15 +15,15 @@ const DEFAULT_BUDGET = 8;
 const defaultDistributions: DistributionMap = { learningRate: 'log-uniform', weightDecay: 'uniform', dropout: 'uniform' };
 const defaultCenters: CenterMap = { learningRate: .5, weightDecay: .5, dropout: .5 };
 const parameterConfigs: Array<{ key: ParameterKey; abbr: string; name: string; range: string }> = [
-  { key: 'learningRate', abbr: 'lr', name: 'Learning Rate', range: '1e−5 ～ 1e−2' },
-  { key: 'weightDecay', abbr: 'wd', name: 'Weight Decay', range: '0 ～ 0.1' },
+  { key: 'learningRate', abbr: 'lr', name: '学习率', range: '1e−5 ～ 1e−2' },
+  { key: 'weightDecay', abbr: 'wd', name: '权重衰减', range: '0 ～ 0.1' },
   { key: 'dropout', abbr: 'dropout', name: 'Dropout', range: '0 ～ 0.5' },
 ];
-const distributionOptions = [{ value: 'uniform', label: 'Uniform' }, { value: 'log-uniform', label: 'Log-Uniform' }];
+const distributionOptions = [{ value: 'uniform', label: '范围内均匀选择' }, { value: 'log-uniform', label: '按对数尺度选择' }];
 const landscapePresets: Array<{ value: LandscapeProfile; label: string; description: string; landscape: Landscape }> = [
-  { value: 'plateau', label: '平缓曲面', description: '较大范围内性能接近，容易找到稳定的可用方案。', landscape: { peak: 95.8, optimum: { lr: .55, wd: .38, dropout: .42 }, phases: [.8, 2.1, 4.3], profile: 'plateau' } },
-  { value: 'sharp', label: '尖峰曲面', description: '高性能区域很小，采样范围和搜索轮数更关键。', landscape: { peak: 97.2, optimum: { lr: .31, wd: .68, dropout: .27 }, phases: [2.4, .6, 3.7], profile: 'sharp' } },
-  { value: 'multimodal', label: '多峰曲面', description: '存在多个局部好区域，少量实验可能过早停在次优方案。', landscape: { peak: 96.5, optimum: { lr: .72, wd: .29, dropout: .66 }, phases: [4.8, 1.7, .4], profile: 'multimodal' } },
+  { value: 'plateau', label: '较容易找到', description: '不少组合都能得到接近的效果，少量实验也可能找到可用方案。', landscape: { peak: 95.8, optimum: { lr: .55, wd: .38, dropout: .42 }, phases: [.8, 2.1, 4.3], profile: 'plateau' } },
+  { value: 'sharp', label: '范围很窄', description: '效果好的组合集中在很小范围内，需要更多尝试才容易遇到。', landscape: { peak: 97.2, optimum: { lr: .31, wd: .68, dropout: .27 }, phases: [2.4, .6, 3.7], profile: 'sharp' } },
+  { value: 'multimodal', label: '多个可行区域', description: '不同组合都可能表现不错，少量实验未必能比较出最好的选择。', landscape: { peak: 96.5, optimum: { lr: .72, wd: .29, dropout: .66 }, phases: [4.8, 1.7, .4], profile: 'multimodal' } },
 ];
 
 function formatScientific(value: number) {
@@ -200,31 +200,44 @@ export function RandomSearchSimulationBlock({ onComplete }: RandomSearchSimulati
   }), []);
 
   const activePreset = landscapePresets.find((preset) => preset.value === landscapeProfile)!;
+  const samplingSummary = distributions.learningRate === 'log-uniform'
+    ? '学习率通常跨越多个数量级，因此这里使用对数尺度选择；权重衰减和 Dropout 则直接在设定范围内随机选择。'
+    : '现在三个参数都直接在设定范围内随机选择；学习率跨越多个数量级时，对数尺度通常更合适。';
+  const searchReadout = running
+    ? `正在进行第 ${completed + 1} 次实验：每个新点代表一种完整方案，颜色越暖表示实验结果越好。`
+    : completed === budget && bestSample
+      ? `这轮 ${budget} 次实验中，最好的组合达到 ${bestSample.score.toFixed(1)}%；与可达到的最好结果相差 ${(scenario.referenceMaximum - bestSample.score).toFixed(1)} 个百分点。`
+      : '网格搜索会按照固定规则遍历组合，而随机搜索会直接在范围内选择不同方案进行实验。';
 
-  return <ContentBlock className="hp-block hp-random-block" title="随机搜索：把预算用在更多取值上" subtitle="设定采样范围，让有限的实验覆盖更多参数组合。">
-    <section className="hp-random-scenes" aria-label="练习场景">
-      <div role="group" aria-label="选择性能地形">{landscapePresets.map((preset) => <button key={preset.value} type="button" className={preset.value === landscapeProfile ? 'is-active' : ''} disabled={running} aria-pressed={preset.value === landscapeProfile} onClick={() => changeLandscape(preset.value)}>{preset.label}</button>)}</div>
+  return <ContentBlock className="hp-block hp-random-block" title="随机搜索：用有限实验探索更多可能" subtitle="不再遍历所有组合，而是在指定范围内随机选择实验方案。">
+    <section className="hp-random-scenes" aria-label="比较不同情况">
+      <div role="group" aria-label="选择实验情况">{landscapePresets.map((preset) => <button key={preset.value} type="button" className={preset.value === landscapeProfile ? 'is-active' : ''} disabled={running} aria-pressed={preset.value === landscapeProfile} onClick={() => changeLandscape(preset.value)}>{preset.label}</button>)}</div>
       <p>{activePreset.description}</p>
     </section>
-    <section className="hp-random-3d-stage"><PlotlyChart className="hp-random-plot" data={chartData} layout={chartLayout} minHeight={470} aria-label="以热力颜色表示验证性能的三维随机搜索空间" onGraphReady={handleGraphReady} /></section>
-    <section className="hp-random-command" aria-label="随机搜索控制">
-      <div className="hp-random-command-status"><span>{running ? '正在搜索' : completed === budget ? '搜索完成' : '实验预算'}</span><strong>{running ? `${completed} / ${budget}` : `${budget} 次`}</strong></div>
-      <div className="hp-random-command-result"><span>当前方案最高值</span><strong>{bestSample ? `${bestSample.score.toFixed(1)}%` : '—'}</strong></div>
-      <div className="hp-random-command-result"><span>该分布最高值</span><strong>{scenario.referenceMaximum.toFixed(1)}%</strong></div>
-      <button className="hp-random-settings-toggle" type="button" disabled={running} aria-expanded={settingsOpen} onClick={() => setSettingsOpen((open) => !open)}><span className="hp-random-settings-icon" aria-hidden="true"><i /><i /><i /></span><b>采样设置</b><span className="hp-random-settings-chevron" aria-hidden="true" /></button>
-      <Button className="hp-random-start" variant="primary" disabled={running} onClick={start}>{completed ? '重新搜索' : '开始搜索'}</Button>
+    <section className="hp-random-explanation" aria-label="随机搜索说明">
+      <NoticeStrip tone="blue" lead="先理解方法：">{searchReadout}</NoticeStrip>
+      <Callout tone="orange" label="为什么随机搜索可能更有效？" text={`很多时候，只有少数超参数真正影响模型性能。如果把大量实验花在不重要的方向上，搜索效率会降低。随机选择不同方案，能让有限实验覆盖更多可能。${samplingSummary}`} />
     </section>
-    {settingsOpen && <section className="hp-random-settings" aria-label="采样设置">
-      <header><div><strong>采样设置</strong><span>三个参数独立采样，共同组成一次实验。</span></div><button type="button" onClick={() => setSettingsOpen(false)}>完成</button></header>
+    <section className="hp-random-3d-stage"><PlotlyChart className="hp-random-plot" data={chartData} layout={chartLayout} minHeight={470} aria-label="展示不同随机实验方案及其结果的三维图" onGraphReady={handleGraphReady} /></section>
+    <section className="hp-random-command" aria-label="随机搜索操作">
+      <div className="hp-random-command-status"><span>{running ? '正在比较' : completed === budget ? '比较完成' : '计划实验次数'}</span><strong>{running ? `${completed} / ${budget}` : `${budget} 次`}</strong></div>
+      <div className="hp-random-command-result"><span>目前最好的结果</span><strong>{bestSample ? `${bestSample.score.toFixed(1)}%` : '—'}</strong></div>
+      <div className="hp-random-command-result"><span>可达到的最好结果</span><strong>{scenario.referenceMaximum.toFixed(1)}%</strong></div>
+      <button className="hp-random-settings-toggle" type="button" disabled={running} aria-expanded={settingsOpen} onClick={() => setSettingsOpen((open) => !open)}><span className="hp-random-settings-icon" aria-hidden="true"><i /><i /><i /></span><b>如何生成实验？</b><span className="hp-random-settings-chevron" aria-hidden="true" /></button>
+      <Button className="hp-random-start" variant="primary" disabled={running} onClick={start}>{completed ? '重新比较' : '开始比较'}</Button>
+    </section>
+    {settingsOpen && <section className="hp-random-settings" aria-label="如何生成随机实验">
+      <header><div><strong>如何生成随机实验？</strong><span>不同超参数具有不同取值特点，因此可以选择不同的采样方式。</span></div><button type="button" onClick={() => setSettingsOpen(false)}>完成</button></header>
       <div className="hp-random-setting-list">{parameterConfigs.map((parameter) => {
         const open = activeParameter === parameter.key;
         return <article key={parameter.key} className={open ? 'is-open' : ''}>
-          <button className="hp-random-setting-row" type="button" aria-expanded={open} onClick={() => setActiveParameter(open ? null : parameter.key)}><code>{parameter.abbr}</code><span><strong>{parameter.name}</strong><small>{parameter.range}</small></span><b>{distributions[parameter.key] === 'log-uniform' ? 'Log-Uniform' : 'Uniform'}</b><i aria-hidden="true">›</i></button>
-          {open && <div className="hp-random-setting-detail"><Select label="采样分布" options={distributionOptions} value={distributions[parameter.key]} onChange={(value) => changeDistribution(parameter.key, value)} /><RangeControl label="采样中心" min={0} max={1} step={.05} value={centers[parameter.key]} scale={['偏小', '偏大']} formatValue={(value) => `${Math.round(Number(value) * 100)}%`} onChange={(event) => changeCenter(parameter.key, Number(event.currentTarget.value))} /></div>}
+          <button className="hp-random-setting-row" type="button" aria-expanded={open} onClick={() => setActiveParameter(open ? null : parameter.key)}><code>{parameter.abbr}</code><span><strong>{parameter.name}</strong><small>{parameter.range}</small></span><b>{distributions[parameter.key] === 'log-uniform' ? '对数尺度' : '均匀选择'}</b><i aria-hidden="true">›</i></button>
+          {open && <div className="hp-random-setting-detail"><Select label="随机选择方式" options={distributionOptions} value={distributions[parameter.key]} onChange={(value) => changeDistribution(parameter.key, value)} /><RangeControl label="更常尝试的取值" min={0} max={1} step={.05} value={centers[parameter.key]} scale={['偏小', '偏大']} formatValue={(value) => `${Math.round(Number(value) * 100)}%`} onChange={(event) => changeCenter(parameter.key, Number(event.currentTarget.value))} /></div>}
         </article>;
       })}</div>
-      <div className="hp-random-settings-budget"><RangeControl label="实验预算" min={4} max={32} step={4} value={budget} discrete scale={['4', '8', '12', '16', '20', '24', '28', '32']} formatValue={(value) => `${value} 次`} onChange={(event) => changeBudget(Number(event.currentTarget.value))} /></div>
+      <div className="hp-random-settings-budget"><RangeControl label="计划尝试次数" min={4} max={32} step={4} value={budget} discrete scale={['4', '8', '12', '16', '20', '24', '28', '32']} formatValue={(value) => `${value} 次`} onChange={(event) => changeBudget(Number(event.currentTarget.value))} /></div>
     </section>}
-    {completed === budget && !running && <Question persistenceKey="random-search-advantage-v7" type="choice" title="在实验预算相同的情况下，随机搜索的主要优势是什么？" options={[{ key: 'A', value: 'grid', label: '按固定间隔系统地覆盖预设候选组合，便于复现实验路径', wrongFeedback: '这是网格搜索：它穷举固定候选组合，而不是从分布中独立采样。' }, { key: 'B', value: 'local', label: '围绕当前表现最好的组合逐步缩小范围，提高局部搜索精度', wrongFeedback: '这是局部搜索思路；普通随机搜索不会根据当前最好结果自动缩小范围。' }, { key: 'C', value: 'coverage', label: '每次独立采样，可以覆盖更多不同的参数取值' }, { key: 'D', value: 'adaptive', label: '根据已有验证结果调整下一次采样位置，把预算集中到高分区域', wrongFeedback: '这是自适应或贝叶斯优化思路；普通随机搜索的下一次采样不依赖已有分数。' }]} answer="coverage" feedback={{ correct: '正确。随机搜索通过独立采样探索不同取值，较少把预算重复花在固定网格线上。', wrong: '固定间隔对应网格搜索，围绕高分区域缩小或调整采样位置则属于局部或自适应搜索。' }} onCheck={(result) => { if (result.ok) onComplete?.(); }} />}
+    {completed === budget && !running && bestSample && <Callout className="hp-random-result-explanation" tone="green" label="怎样看实验结果：" text={`目前最好的结果不代表已经找到了所有方案中的最佳选择。它与可达到的最好结果相差 ${(scenario.referenceMaximum - bestSample.score).toFixed(1)} 个百分点；如果差距较大，可以多尝试几次，或调整范围后再比较。`} />}
+    {completed === budget && !running && <Question persistenceKey="random-search-advantage-v7" type="choice" title="实验次数相同时，随机搜索为什么常能更高效地比较不同方案？" options={[{ key: 'A', value: 'grid', label: '它按固定间隔列出每一种预设组合，确保全部都被尝试', wrongFeedback: '这是网格搜索的做法：它会遍历预先列出的组合。' }, { key: 'B', value: 'local', label: '它会自动围绕目前最好的组合，逐步缩小尝试范围', wrongFeedback: '普通随机搜索不会根据当前结果自动改变下一次尝试的位置。' }, { key: 'C', value: 'coverage', label: '每次独立选择不同取值，让有限实验覆盖更多可能' }, { key: 'D', value: 'adaptive', label: '它会根据已有结果，把下一次实验只放在分数高的区域', wrongFeedback: '这是会根据结果调整策略的方法；普通随机搜索的每次选择彼此独立。' }]} answer="coverage" feedback={{ correct: '正确。随机搜索让每次实验独立选择不同取值，因此有限次数也能比较更多可能。', wrong: '固定遍历是网格搜索；根据已有结果调整下一步，则是另一类会自适应调整的方法。' }} onCheck={(result) => { if (result.ok) onComplete?.(); }} />}
   </ContentBlock>;
 }
