@@ -1,0 +1,71 @@
+import { useEffect, type HTMLAttributes, type ReactNode } from 'react';
+import { classNames } from '../utils';
+
+let mathliveRequest: Promise<unknown> | null = null;
+
+function ensureMathlive() {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if (customElements.get('math-field')) return Promise.resolve();
+  mathliveRequest ??= import('../../vendor/mathlive/mathlive.min.mjs');
+  return mathliveRequest;
+}
+
+export interface MathFormulaTermProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'title'> {
+  latex: string;
+  tooltip: ReactNode;
+  ariaLabel?: string;
+  tone?: 'default' | 'warm';
+}
+
+export interface MathFormulaBlockProps extends HTMLAttributes<HTMLDivElement> {
+  ariaLabel?: string;
+  children: ReactNode;
+}
+
+export function MathFormulaTerm({ latex, tooltip, ariaLabel, tone = 'default', className, ...props }: MathFormulaTermProps) {
+  const tooltipText = typeof tooltip === 'string' ? tooltip : String(tooltip ?? '');
+
+  useEffect(() => {
+    ensureMathlive().catch(() => {
+      document.documentElement.classList.add('dl-mathlive-unavailable');
+    });
+  }, []);
+
+  return (
+    <span
+      {...props}
+      className={classNames('math-formula-term', tone === 'warm' && 'math-formula-term--warm', className)}
+      tabIndex={props.tabIndex ?? 0}
+      data-tooltip={tooltipText}
+      aria-label={ariaLabel ?? tooltipText}
+    >
+      <math-field read-only="true" virtual-keyboard-mode="manual" aria-hidden="true">
+        {latex}
+      </math-field>
+    </span>
+  );
+}
+
+export function MathFormulaStatic({ latex, className, ...props }: { latex: string; className?: string } & HTMLAttributes<HTMLSpanElement>) {
+  useEffect(() => {
+    ensureMathlive().catch(() => {
+      document.documentElement.classList.add('dl-mathlive-unavailable');
+    });
+  }, []);
+
+  return (
+    <span {...props} className={classNames('math-formula-static', className)}>
+      <math-field read-only="true" virtual-keyboard-mode="manual" aria-hidden="true">
+        {latex}
+      </math-field>
+    </span>
+  );
+}
+
+export function MathFormulaBlock({ ariaLabel, children, className, ...props }: MathFormulaBlockProps) {
+  return (
+    <div className={classNames('edu-formula-block', 'math-formula-block', className)} {...props}>
+      <div className="math-formula" aria-label={ariaLabel}>{children}</div>
+    </div>
+  );
+}

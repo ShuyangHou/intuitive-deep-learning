@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { DatasetSplitPage } from '../../modules/Dataset-Split-Module/DatasetSplitPage';
+import { FormulaTooltipPage } from '../../modules/Formula-Tooltip-React/FormulaTooltipPage';
 import { HyperparameterPage } from '../../modules/Hyperparameter-Module/HyperparameterPage';
 import { ActivationFuncPage } from '../../modules/Activation-Func-Module-React/ActivationFuncPage';
 import { GradientDescentPage } from '../../modules/Gradient-Descent-Module-React/GradientDescentPage';
@@ -69,6 +70,12 @@ export const migratedModules: MigratedModule[] = [
     element: <LossGuidePage />,
   },
   {
+    id: 'formula-tooltip-react',
+    title: 'LaTeX 公式拆解演示',
+    description: '用 MathLive 渲染训练目标函数，并为每个公式片段提供悬浮解释。',
+    path: '/modules/formula-tooltip-react',
+    badge: '公式实验模块',
+    element: <FormulaTooltipPage />,
     id: 'gradient-descent-module-react',
     title: '梯度下降导览',
     description: '从手动调节输出层权重，到学习率实验和完整网络参数更新。',

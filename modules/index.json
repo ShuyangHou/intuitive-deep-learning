@@ -53,6 +53,28 @@
       ]
     },
     {
+      "id": "Formula-Tooltip-Lab",
+      "title": "LaTeX 公式拆解演示",
+      "use_when": "用户需要在深度学习教学页面展示专业数学公式，并希望通过悬浮、点击或键盘聚焦解释公式中的变量、算子和正则项时使用。",
+      "summary": "用 MathLive 渲染一个带 L2 正则化的训练目标，并复用 shared 的浮层说明组件逐项解释公式。",
+      "prerequisites": [
+        "损失函数",
+        "模型权重",
+        "L2 正则化"
+      ]
+    },
+    {
+      "id": "Formula-Tooltip-React",
+      "title": "React LaTeX 公式拆解演示",
+      "use_when": "用户需要在 React 教学模块中展示专业 LaTeX 数学公式，并希望公式片段可悬浮、点击或键盘聚焦显示含义时使用。",
+      "summary": "基于 MathLive 和 shared React 组件渲染训练目标函数，展示可复用的公式片段解释方案。",
+      "prerequisites": [
+        "损失函数",
+        "模型权重",
+        "L2 正则化"
+      ]
+    },
+    {
       "id": "Gradient-Descent-Module",
       "title": "梯度下降如何让模型变好",
       "use_when": "用户想理解模型犯错后，输出层权重如何影响预测与损失，并进一步学习梯度下降时使用。",
