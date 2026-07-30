@@ -1,4 +1,5 @@
 import { useEffect, useState, type HTMLAttributes, type ReactNode } from 'react';
+import { Typography } from '../typography/Typography';
 import { classNames } from '../utils';
 
 export type FeedbackTone = 'orange' | 'blue' | 'green' | 'red';
@@ -75,10 +76,10 @@ export function Callout({
       )}
       {...props}
     >
-      {label !== undefined && <strong className="edu-callout-label">{label}</strong>}
-      <span className="edu-callout-text" data-stream-output={streaming || undefined}>
+      {label !== undefined && <Typography as="strong" variant="label" tone="inherit" className="edu-callout-label">{label}</Typography>}
+      <Typography as="span" variant="bodySmall" tone="inherit" className="edu-callout-text" data-stream-output={streaming || undefined}>
         {sourceText !== null && streamedText !== null ? streamedText : content}
-      </span>
+      </Typography>
     </div>
   );
 }

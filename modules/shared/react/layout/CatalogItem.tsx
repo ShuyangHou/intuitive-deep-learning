@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Typography } from '../typography/Typography';
 import { classNames } from '../utils';
 
 export type CatalogItemVariant = 'foundation' | 'button' | 'control' | 'visual';
@@ -23,8 +24,8 @@ export function CatalogItem({
       <article className={classNames(`${variant}-entry`, className)}>
         <div className={`${variant}-preview`}>{children}</div>
         <div className={`${variant}-copy`}>
-          <h3>{title}</h3>
-          {description !== undefined && <p>{description}</p>}
+          <Typography as="h3" variant="h3">{title}</Typography>
+          {description !== undefined && <Typography variant="bodySmall" tone="muted">{description}</Typography>}
         </div>
       </article>
     );
@@ -34,8 +35,8 @@ export function CatalogItem({
   return (
     <article className={classNames(visual ? 'visual-entry' : 'foundation-entry', className)}>
       <header className={visual ? 'visual-entry-head' : 'foundation-entry-head'}>
-        <h3>{title}</h3>
-        {description !== undefined && <p>{description}</p>}
+        <Typography as="h3" variant="h3">{title}</Typography>
+        {description !== undefined && <Typography variant="bodySmall" tone="muted">{description}</Typography>}
       </header>
       {children}
     </article>

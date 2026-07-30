@@ -1,3 +1,5 @@
+@import './typography/typography.css';
+
 :root {
   --ui-bg-page: #eef2f7;
   --ui-bg-page-top: #f7f9fc;
@@ -79,7 +81,7 @@ button, input, textarea, select { font: inherit; }
 .edu-stage-title { margin: 0; color: var(--ui-accent); font-size: 28px; font-weight: 950; line-height: 1.22; overflow-wrap: anywhere; }
 .edu-stage-description { max-width: 780px; margin: 9px 0 0; color: var(--ui-text-muted); font-size: 14px; font-weight: 760; line-height: 1.72; }
 
-.edu-callout { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 8px 12px; min-height: 48px; border-left: 4px solid var(--callout-border, var(--ui-border-strong)); border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0; background: var(--callout-bg, var(--ui-bg-muted)); color: var(--ui-text-main); padding: 12px 14px; font-size: 13px; font-weight: 750; line-height: 1.65; }
+.edu-callout { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 8px 12px; min-height: 48px; border-left: 4px solid var(--callout-border, var(--ui-border-strong)); border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0; background: var(--callout-bg, var(--ui-bg-muted)); color: var(--ui-text-main); padding: 12px 14px; }
 .edu-callout-label { color: var(--callout-label, var(--ui-text-main)); font-weight: 950; }
 .edu-callout-text { min-width: 0; }
 .edu-callout--orange { --callout-border: var(--ui-accent-alt); --callout-bg: rgba(240, 126, 71, .08); --callout-label: var(--ui-accent-alt); }
@@ -325,8 +327,7 @@ svg .edu-attention-hint { fill: none; stroke: rgba(var(--attention-hint-rgb), .5
 .visual-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 28px; }
 .visual-entry { display: grid; gap: 12px; min-width: 0; border-bottom: 1px solid var(--ui-border); padding: 8px 0 26px; }
 .visual-entry--wide { grid-column: 1 / -1; }
-.visual-entry-head h3 { margin: 0; color: var(--ui-text-main); font-size: 17px; font-weight: 900; }
-.visual-entry-head p { margin: 6px 0 0; color: var(--ui-text-muted); font-size: 13px; line-height: 1.65; }
+.visual-entry-head p { margin-top: 6px; }
 .visual-canvas, .visual-plot { display: block; width: 100%; min-height: 230px; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-sm); background: var(--ui-bg-muted); }
 .visual-canvas { overflow: hidden; }
 .visual-canvas canvas { display: block; width: 100%; height: 100%; min-height: 230px; }
@@ -377,8 +378,7 @@ svg .edu-attention-hint { fill: none; stroke: rgba(var(--attention-hint-rgb), .5
 @keyframes edu-lesson-flow-reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 .foundation-entry { border-bottom: 1px solid var(--ui-border); padding: 8px 0 30px; }
 .foundation-entry-head { max-width: 820px; margin-bottom: 14px; }
-.foundation-entry-head h3, .button-copy h3, .control-copy h3 { margin: 0; color: var(--ui-text-main); font-size: 17px; font-weight: 900; line-height: 1.35; }
-.foundation-entry-head p, .button-copy p, .control-copy p { margin: 6px 0 0; color: var(--ui-text-muted); font-size: 13px; line-height: 1.65; }
+.foundation-entry-head p, .button-copy p, .control-copy p { margin-top: 6px; }
 .button-entry { display: grid; grid-template-columns: minmax(148px, .42fr) minmax(0, 1fr); align-items: center; gap: 18px; min-height: 116px; border-bottom: 1px solid var(--ui-border); padding: 18px 0; }
 .control-entry { display: grid; grid-template-columns: minmax(190px, .56fr) minmax(0, 1fr); align-items: center; gap: 18px; min-height: 136px; border-bottom: 1px solid var(--ui-border); padding: 18px 0; }
 .button-preview, .control-preview, .button-copy, .control-copy { min-width: 0; }
