@@ -19,6 +19,12 @@ import { ProgressiveReveal } from '../learning/ProgressiveReveal';
 import { PanelChoiceQuestion } from '../learning/PanelChoiceQuestion';
 import { CodeCompletionBlock } from '../learning/CodeCompletionBlock';
 import { ValueTile } from '../learning/ValueTile';
+import {
+  Typography,
+  typographyVariantMapping,
+  type TypographyTone,
+  type TypographyVariant,
+} from '../typography/Typography';
 import { FunctionPlot, type FunctionSeries } from '../visuals/FunctionPlot';
 import { PlotlyChart, type PlotlyLayout, type PlotlyTrace } from '../visuals/PlotlyChart';
 import '../ui-kit.css';
@@ -43,14 +49,166 @@ const panelChoiceOptions = [
   { key: 'C', value: 'video', title: '动态场景', caption: '视频内容', media: <span>视频媒体槽</span>, wrongFeedback: '这是视频媒体，不是由坐标数据绘制的函数图。' },
 ];
 
+const typographyVariants: Array<{
+  variant: TypographyVariant;
+  label: string;
+  usage: string;
+  sample: string;
+}> = [
+  { variant: 'display', label: '展示标题', usage: '极少数课程主视觉标题', sample: '亲手看见模型如何学习' },
+  { variant: 'h1', label: '一级标题', usage: '每个完整模块的主标题', sample: '超参数与搜索策略' },
+  { variant: 'h2', label: '二级标题', usage: '内容块和主要学习阶段', sample: '模型学习什么，我们决定什么' },
+  { variant: 'h3', label: '三级标题', usage: '面板、实验或局部小节', sample: '改变训练规则会发生什么？' },
+  { variant: 'subtitle', label: '副标题', usage: '紧跟标题解释当前学习目标', sample: '拖动参数，观察训练过程如何改变。' },
+  { variant: 'body', label: '正文', usage: '主要解释、结论和教学文案', sample: '学习率决定模型每次更新参数时迈出多大一步。' },
+  { variant: 'bodySmall', label: '小正文', usage: '紧凑面板、控件附近的补充说明', sample: '真实结果仍需结合验证集表现判断。' },
+  { variant: 'label', label: '标签', usage: '表单、指标和状态名称', sample: '当前学习率' },
+  { variant: 'caption', label: '说明文字', usage: '图注、来源和低优先级帮助', sample: '数值保留三位小数' },
+  { variant: 'button', label: '按钮文字', usage: 'Button 等操作组件内部使用', sample: '继续学习' },
+  { variant: 'numeric', label: '关键数值', usage: '损失、准确率和动态读数', sample: '92.40%' },
+  { variant: 'code', label: '代码文字', usage: '变量、短代码和等宽文本', sample: 'learning_rate = 0.001' },
+  { variant: 'inherit', label: '继承', usage: '需要完整继承父组件文字样式时使用', sample: '继承父组件的排版' },
+];
+
+const typographyTones: Array<{ tone: TypographyTone; label: string; usage: string }> = [
+  { tone: 'main', label: '主要文字', usage: '默认正文' },
+  { tone: 'muted', label: '弱化文字', usage: '副标题和补充说明' },
+  { tone: 'light', label: '轻量文字', usage: '最低优先级信息' },
+  { tone: 'accent', label: '强调文字', usage: '主要概念和当前位置' },
+  { tone: 'success', label: '成功文字', usage: '正确和完成状态' },
+  { tone: 'warning', label: '警告文字', usage: '需要注意但可继续' },
+  { tone: 'danger', label: '危险文字', usage: '错误和高风险状态' },
+  { tone: 'inherit', label: '继承颜色', usage: '由父组件决定颜色' },
+];
+
 export function UiKitPage() {
   return <ModuleShell title="UI Kit" subtitle="教学模块的统一界面组件与交互规范。" shellClassName="kit-shell edu-shell--scaled" headerClassName="kit-header">
+    <section className="kit-section" aria-labelledby="typography-title">
+      <header className="kit-section-head">
+        <h2 id="typography-title">文字系统 Typography</h2>
+        <p>统一文字的视觉等级、语义颜色、对齐与换行。Shared 组件内部自动使用；模块中独立出现的文字才直接使用 Typography。</p>
+      </header>
+
+      <div className="kit-type-stack">
+        <article className="kit-type-panel">
+          <header className="kit-type-panel-head">
+            <Typography as="h3" variant="h3">字体家族</Typography>
+            <Typography variant="bodySmall" tone="muted">默认使用系统无衬线字体；数值和代码使用等宽字体。后续替换字体只修改共享 token。</Typography>
+          </header>
+          <div className="kit-font-family-grid">
+            <div>
+              <Typography variant="label" tone="muted">--ui-font-sans</Typography>
+              <Typography variant="h3">中文教学文字 Aa 123</Typography>
+            </div>
+            <div>
+              <Typography variant="label" tone="muted">--ui-font-mono</Typography>
+              <Typography variant="code">Loss = 0.024 · epoch_12</Typography>
+            </div>
+          </div>
+        </article>
+
+        <article className="kit-type-panel">
+          <header className="kit-type-panel-head">
+            <Typography as="h3" variant="h3">全部文字等级</Typography>
+            <Typography variant="bodySmall" tone="muted">variant 只决定视觉等级；默认 HTML 标签如下，必要时可用 as 单独调整语义。</Typography>
+          </header>
+          <div className="kit-type-catalog">
+            {typographyVariants.map(({ variant, label, usage, sample }) => (
+              <div className="kit-type-entry" key={variant}>
+                <div className="kit-type-meta">
+                  <Typography variant="label">{variant}</Typography>
+                  <Typography variant="caption" tone="muted">{label} · 默认 &lt;{String(typographyVariantMapping[variant])}&gt;</Typography>
+                  <Typography variant="caption" tone="light">{usage}</Typography>
+                </div>
+                <Typography as="p" variant={variant}>{sample}</Typography>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="kit-type-panel">
+          <header className="kit-type-panel-head">
+            <Typography as="h3" variant="h3">语义颜色 Tone</Typography>
+            <Typography variant="bodySmall" tone="muted">使用颜色角色，不直接填写色值。主题调整时所有文字会一起更新。</Typography>
+          </header>
+          <div className="kit-tone-grid">
+            {typographyTones.map(({ tone, label, usage }) => (
+              <div className="kit-tone-entry" key={tone}>
+                <Typography variant="body" tone={tone}>{label}</Typography>
+                <Typography variant="caption" tone="muted">{tone} · {usage}</Typography>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="kit-type-panel">
+          <header className="kit-type-panel-head">
+            <Typography as="h3" variant="h3">对齐与换行</Typography>
+            <Typography variant="bodySmall" tone="muted">对齐使用 start/end 以兼容未来语言方向；标题默认平衡换行，正文默认优化段落换行。</Typography>
+          </header>
+          <div className="kit-alignment-grid">
+            <Typography variant="bodySmall" align="start">align="start"</Typography>
+            <Typography variant="bodySmall" align="center">align="center"</Typography>
+            <Typography variant="bodySmall" align="end">align="end"</Typography>
+          </div>
+          <div className="kit-wrap-grid">
+            <div><Typography variant="label" tone="muted">normal</Typography><Typography variant="bodySmall" wrap="normal">普通换行适合连续正文，这段内容会按照容器宽度自然进入下一行。</Typography></div>
+            <div><Typography variant="label" tone="muted">balance</Typography><Typography variant="h3" wrap="balance">平衡换行让多行标题的长度更加接近</Typography></div>
+            <div><Typography variant="label" tone="muted">nowrap</Typography><Typography variant="bodySmall" wrap="nowrap">保持单行，不裁切内容</Typography></div>
+            <div><Typography variant="label" tone="muted">truncate</Typography><Typography variant="bodySmall" wrap="truncate">单行空间不足时截断，并在结尾显示省略号</Typography></div>
+          </div>
+        </article>
+
+        <article className="kit-type-panel">
+          <header className="kit-type-panel-head">
+            <Typography as="h3" variant="h3">使用、自定义与新增</Typography>
+            <Typography variant="bodySmall" tone="muted">保持入口简单：Shared 组件自动处理自己的文字；只有模块独立文案直接使用 Typography。</Typography>
+          </header>
+          <div className="kit-type-guide-grid">
+            <section>
+              <Typography as="h4" variant="label">独立文字</Typography>
+              <pre className="kit-code-sample"><code>{`<Typography variant="h2">
+  当前训练状态
+</Typography>
+
+<Typography variant="body" tone="muted">
+  模型正在接近最低点。
+</Typography>`}</code></pre>
+            </section>
+            <section>
+              <Typography as="h4" variant="label">Shared 组件文字</Typography>
+              <pre className="kit-code-sample"><code>{`<ModuleShell
+  title="超参数与搜索策略"
+  subtitle="观察参数如何影响训练"
+/>
+
+<Button>继续学习</Button>`}</code></pre>
+            </section>
+            <section>
+              <Typography as="h4" variant="label">自定义现有样式</Typography>
+              <Typography variant="bodySmall" tone="muted">在 <code>typography.css</code> 中修改对应的 <code>--ui-type-*</code> token，不在模块 CSS 中重写字号、字重或行高。</Typography>
+            </section>
+            <section>
+              <Typography as="h4" variant="label">新增文字等级</Typography>
+              <ol className="kit-type-steps">
+                <li>确认现有 variant 无法表达真实且可复用的语义。</li>
+                <li>向 TypographyVariant 和默认标签映射加入名称。</li>
+                <li>在 typography.css 增加 token 与样式。</li>
+                <li>在本栏目补充预览、用途和窄屏检查。</li>
+                <li>确认至少两个场景会复用后，再提供给模块使用。</li>
+              </ol>
+            </section>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section className="kit-section" aria-labelledby="foundation-title"><header className="kit-section-head"><h2 id="foundation-title">基础展示</h2><p>定义每个教学小块的固定结构，以及正文中允许复用的提示、指标、公式和代码运行组件。</p></header><div className="foundation-catalog">
       <CatalogItem title="标准内容块" description="每个小块只保留一个主标题、一个副标题和一个正文区域。"><ContentBlock className="foundation-preview" title="损失就是距离" subtitle="Loss 衡量真实值和预测值之间差多少。这里先用一条数轴，把这种差距直接画出来。"><p className="edu-body">训练的目标不是记住一个答案，而是持续缩小预测与真实结果之间的距离。</p><p className="edu-body">先改变预测值，再观察 <strong className="edu-emphasis">L1 Loss</strong> 如何变化。</p></ContentBlock></CatalogItem>
       <CatalogItem title="提示框" description="颜色和播放方式是两个独立维度。每种颜色都可以直接显示，也可以逐字显示。"><div className="foundation-stack foundation-preview--compact"><Callout tone="orange" label="你的任务" text="拖动绿色预测值，让它与红色真实值重合，把 Loss 缩小到 0。" /><ReplayableCallouts className="foundation-stack" replayLabel="重播四种逐字提示" items={[{ tone: 'orange', label: '思考提示', text: '先比较预测值和真实值，再判断应该向左还是向右移动。', streaming: true, streamInterval: 24 }, { tone: 'blue', label: '逐步解释', text: '预测值每靠近真实值一步，损失就会随距离一起减小。', streaming: true, streamInterval: 24 }, { tone: 'green', label: '正确反馈', text: '方向判断正确，继续缩小距离就能进一步降低损失。', streaming: true, streamInterval: 24 }, { tone: 'red', label: '风险提醒', text: '学习率过大可能越过最低点，导致训练过程来回震荡。', streaming: true, streamInterval: 24 }]} /><Feedback status="correct" label="正确反馈" message="方向判断正确，可以继续。" /><Feedback status="wrong" label="错误提示" message="当前操作让预测值远离真实值。" /></div></CatalogItem>
       <CatalogItem title="紧凑提示条" description="用于紧跟图表、模型或控制区显示一句当前状态。"><div className="foundation-stack foundation-preview--compact"><NoticeStrip tone="blue" lead="观察状态：">已经有 3 个线性神经元了。它们叠加后仍然只是一条直线。</NoticeStrip><NoticeStrip tone="orange" lead="操作提醒：">继续调整参数，比较曲线改变前后的形状。</NoticeStrip><NoticeStrip tone="green" lead="阶段完成：">当前结果已经满足目标，可以进入下一步。</NoticeStrip><NoticeStrip tone="red" lead="需要调整：">当前参数使输出偏离目标，请检查输入范围。</NoticeStrip></div></CatalogItem>
       <CatalogItem title="小型指标块" description="用于一个短标签和一个关键结果。"><div className="foundation-value-row foundation-preview"><ValueTile tone="orange" label="L1 Loss = |真实值 - 预测值|" value="5.4" /><ValueTile tone="blue" label="验证准确率" value="92.4%" /><ValueTile tone="success" label="已完成样本" value="128" /><ValueTile tone="danger" label="误分类样本" value="7" /></div></CatalogItem>
-      <CatalogItem title="公式块" description="用于必须独立阅读的公式，变量可通过悬浮或焦点获得说明。"><div className="foundation-stack foundation-preview--compact"><FormulaBlock ariaLabel="L2 损失公式"><FormulaTerm tooltip="L₂：当前样本的平方损失">L₂</FormulaTerm> = (<FormulaTerm tooltip="y：样本的真实目标值">y</FormulaTerm> - <FormulaTerm tooltip="ŷ：模型给出的预测值">ŷ</FormulaTerm>)<sup><FormulaTerm tooltip="平方：放大较大的预测误差">²</FormulaTerm></sup></FormulaBlock><FormulaBlock ariaLabel="Sigmoid 函数" fraction={{ prefix: <><FormulaTerm tooltip="σ：Sigmoid 函数，把任意实数映射到 0～1">σ</FormulaTerm>(<FormulaTerm tooltip="z：模型输出的原始分数">z</FormulaTerm>) =</>, numerator: '1', denominator: <>1 + e<sup>−z</sup></> }} /></div></CatalogItem>
+      <CatalogItem title="公式块" description="注释粒度以独立数学含义为准：变量、函数、上下标等分别解释；括号、逗号、等号、加减乘除等结构符号默认不注释。"><div className="foundation-stack foundation-preview--compact"><FormulaBlock ariaLabel="L2 损失公式"><FormulaTerm tooltip="L₂：当前样本的平方损失">L₂</FormulaTerm> = (<FormulaTerm tooltip="y：样本的真实目标值">y</FormulaTerm> - <FormulaTerm tooltip="ŷ：模型给出的预测值">ŷ</FormulaTerm>)<sup><FormulaTerm tooltip="平方：放大较大的预测误差">²</FormulaTerm></sup></FormulaBlock><FormulaBlock ariaLabel="Sigmoid 函数" fraction={{ prefix: <><FormulaTerm tooltip="σ：Sigmoid 函数，把任意实数映射到 0～1">σ</FormulaTerm>(<FormulaTerm tooltip="z：模型输出的原始分数">z</FormulaTerm>) =</>, numerator: '1', denominator: <>1 + e<sup>−z</sup></> }} /></div></CatalogItem>
     </div></section>
 
     <section className="kit-section" aria-labelledby="visual-title"><header className="kit-section-head"><h2 id="visual-title">坐标与曲线</h2><p>用于展示函数关系、曲面和训练误差的共享可视化。</p></header><div className="visual-catalog">

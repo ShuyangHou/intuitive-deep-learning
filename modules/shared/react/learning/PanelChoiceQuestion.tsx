@@ -1,6 +1,5 @@
-import { useState, type ReactNode } from 'react';
-import { Feedback } from '../feedback/Feedback';
-import { classNames } from '../utils';
+import type { ReactNode } from 'react';
+import { Question, type QuestionCheckResult } from './Question';
 
 export interface PanelChoiceOption {
   key?: ReactNode;
@@ -17,51 +16,27 @@ export interface PanelChoiceQuestionProps {
   answer: string;
   typeLabel?: ReactNode;
   feedback?: { initial?: ReactNode; correct?: ReactNode; wrong?: ReactNode };
+  persistenceKey?: string;
+  onCheck?: (result: QuestionCheckResult) => void;
 }
 
-export function PanelChoiceQuestion({
-  title,
-  options,
-  answer,
-  typeLabel = '面板单选题',
-  feedback = {},
-}: PanelChoiceQuestionProps) {
-  const [selected, setSelected] = useState<string | null>(null);
-  const correct = selected === answer;
-  const selectedOption = options.find((option) => option.value === selected);
-  const message = selected === null ? feedback.initial : correct ? feedback.correct : selectedOption?.wrongFeedback ?? feedback.wrong;
-
+export function PanelChoiceQuestion({ title, options, answer, typeLabel = '面板单选题', feedback, persistenceKey, onCheck }: PanelChoiceQuestionProps) {
   return (
-    <section className="dl-question" aria-label={String(typeLabel)}>
-      <header className="dl-question-head">
-        <span className="dl-question-type">{typeLabel}</span>
-        <strong className="dl-question-stem">{title}</strong>
-      </header>
-      <div className="dl-panel-choice-grid" role="radiogroup">
-        {options.map((option, index) => {
-          const chosen = selected === option.value;
-          return (
-            <button
-              className={classNames('dl-panel-choice', chosen && (correct ? 'is-correct' : 'is-wrong'))}
-              key={option.value}
-              type="button"
-              role="radio"
-              aria-checked={chosen}
-              onClick={() => setSelected(option.value)}
-            >
-              <div className="dl-panel-choice-media">{option.media}</div>
-              <div className="dl-panel-choice-answer">
-                <span className="dl-panel-choice-key">{option.key ?? String.fromCharCode(65 + index)}</span>
-                <span className="dl-panel-choice-copy">
-                  <strong className="dl-panel-choice-title">{option.title}</strong>
-                  {option.caption !== undefined && <span className="dl-panel-choice-caption">{option.caption}</span>}
-                </span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-      <Feedback status={selected === null ? 'info' : correct ? 'correct' : 'wrong'} message={message} />
-    </section>
+    <Question
+      className="dl-question--panel"
+      type="choice"
+      typeLabel={typeLabel}
+      title={title}
+      answer={answer}
+      feedback={feedback}
+      persistenceKey={persistenceKey}
+      onCheck={onCheck}
+      options={options.map((option) => ({
+        key: option.key,
+        value: option.value,
+        wrongFeedback: option.wrongFeedback,
+        label: <span className="dl-panel-option"><span className="dl-panel-option-media">{option.media}</span><span className="dl-panel-option-copy"><strong>{option.title}</strong>{option.caption !== undefined && <span>{option.caption}</span>}</span></span>,
+      }))}
+    />
   );
 }

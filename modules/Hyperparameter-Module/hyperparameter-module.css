@@ -173,6 +173,8 @@
 .hp-random-scenes button.is-active { background: #fff; box-shadow: 0 3px 12px rgba(31,52,83,.12); color: var(--ui-accent); }
 .hp-random-scenes button:disabled { cursor: default; opacity: .65; }
 .hp-random-scenes p { margin: 0; color: var(--ui-text-muted); font-size: 12px; font-weight: 650; line-height: 1.55; }
+.hp-random-explanation { display: grid; gap: 10px; }
+.hp-random-result-explanation { margin-top: 2px; }
 
 .hp-random-command { display: grid; grid-template-columns: 112px minmax(130px, 1fr) minmax(130px, 1fr) auto auto; align-items: stretch; gap: 0; border: 1px solid var(--ui-border); border-radius: 18px; background: rgba(255,255,255,.94); box-shadow: 0 10px 30px rgba(35,55,84,.08); padding: 8px; }
 .hp-random-command-status, .hp-random-command-result { display: grid; gap: 1px; }

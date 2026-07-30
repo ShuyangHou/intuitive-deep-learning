@@ -15,8 +15,8 @@ const steps: LessonFlowStep[] = [
 export function HyperparameterPage() {
   return (
     <ModuleShell
-      title="超参数与超参数搜索"
-      subtitle="理解常见超参数，并学习怎样比较和选择训练方案。"
+      title="超参数与搜索策略"
+      subtitle="了解模型训练前需要选择什么，并学习如何用有限实验找到更好的组合。"
       shellClassName="hp-shell edu-shell--scaled"
     >
       <LessonFlow steps={steps} persistenceKey="hyperparameter-module-v3" />
