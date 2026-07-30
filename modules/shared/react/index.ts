@@ -2,6 +2,7 @@ export * from './layout/ModuleShell';
 export * from './layout/ContentBlock';
 export * from './layout/LessonStage';
 export * from './layout/CatalogItem';
+export * from './typography';
 
 export * from './feedback/Callout';
 export * from './feedback/NoticeStrip';

@@ -6,6 +6,8 @@ import { GradientDescentPage } from '../../modules/Gradient-Descent-Module-React
 import { LossGuidePage } from '../../modules/Loss-Guide-React/LossGuidePage';
 import { MiscPage } from '../../modules/MISC_Module/MiscPage';
 import { MLPPlaygroundPage } from '../../modules/MLP_playground-React/MLPPlaygroundPage';
+import { FittingPage } from '../../modules/Fitting_Module/FittingPage';
+import { AdaptiveLearningRatePage } from '../../modules/Adaptive-Learning-Rate-Module/AdaptiveLearningRatePage';
 
 /** 已完成 React 迁移、可作为独立教学页面进入的模块。 */
 export interface MigratedModule {
@@ -18,6 +20,22 @@ export interface MigratedModule {
 }
 
 export const migratedModules: MigratedModule[] = [
+  {
+    id: 'adaptive-learning-rate-module',
+    title: '从 SGD 到自适应学习率',
+    description: '理解 SGD 的标准更新形式，以及 AdaGrad、Adam 如何根据梯度历史调整步长。',
+    path: '/modules/adaptive-learning-rate',
+    badge: '互动教学模块',
+    element: <AdaptiveLearningRatePage />,
+  },
+  {
+    id: 'fitting-module',
+    title: '拟合与泛化',
+    description: '从训练与验证曲线判断欠拟合和过拟合。',
+    path: '/modules/fitting-module',
+    badge: '互动教学模块',
+    element: <FittingPage />,
+  },
   {
     id: 'misc-module',
     title: '训练中的计数单位',

@@ -24,7 +24,7 @@ export function HyperparameterLessonFooter() {
     <LessonFooter
       className="hp-block"
       title="本节学习完成"
-      description="你已经理解常见超参数，以及网格搜索与随机搜索怎样比较和选择训练方案。"
+      description="你已经知道哪些训练规则需要提前选择，也能用网格搜索或随机搜索比较不同方案。"
       back={{ href: '../CourseMap/', label: '返回课程主页' }}
       videos={videos}
     />

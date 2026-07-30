@@ -6,7 +6,7 @@ import { classNames } from '../utils';
 export type QuestionType = 'choice' | 'multiple' | 'judgement' | 'fill' | 'short';
 
 export interface QuestionOption {
-  key?: string;
+  key?: ReactNode;
   value: string;
   label: ReactNode;
   /** Explanation shown when this incorrect option is selected. */
@@ -55,7 +55,7 @@ export interface QuestionProps {
   rows?: number;
   typeLabel?: ReactNode;
   submitText?: ReactNode;
-  feedback?: { empty?: ReactNode; correct?: ReactNode; wrong?: ReactNode; sample?: ReactNode };
+  feedback?: { initial?: ReactNode; empty?: ReactNode; correct?: ReactNode; wrong?: ReactNode; sample?: ReactNode };
   instant?: boolean;
   className?: string;
   onCheck?: (result: QuestionCheckResult) => void;
@@ -101,7 +101,7 @@ function optionFeedback(
   const expected = new Set(expectedValues);
   const incorrect = options.filter((option) => selected.has(normalize(option.value)) && !expected.has(normalize(option.value)));
   const missed = multiple ? options.filter((option) => expected.has(normalize(option.value)) && !selected.has(normalize(option.value))) : [];
-  const optionKey = (option: QuestionOption) => option.key ?? String.fromCharCode(65 + options.indexOf(option));
+  const optionKey = (option: QuestionOption) => String(option.key ?? String.fromCharCode(65 + options.indexOf(option)));
   const details = [
     ...incorrect.map((option) => ({ prefix: `误选 ${optionKey(option)}：`, message: option.wrongFeedback })),
     ...missed.map((option) => ({ prefix: `漏选 ${optionKey(option)}：`, message: option.missedFeedback })),
@@ -380,10 +380,10 @@ export function Question({
 
       <Feedback
         status={result?.tone ?? 'info'}
-        message={result?.message}
+        message={result?.message ?? feedback.initial}
         streaming={normalizedType === 'short' && Boolean(result && !result.empty)}
         className="dl-question-feedback"
-        hidden={!result}
+        hidden={!result && feedback.initial === undefined}
       />
     </section>
   );
