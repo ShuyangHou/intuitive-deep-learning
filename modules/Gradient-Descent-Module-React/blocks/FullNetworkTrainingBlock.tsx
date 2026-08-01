@@ -3,8 +3,11 @@ import {
   Button,
   Callout,
   ContentBlock,
+  MathFormulaBlock,
+  MathFormulaStatic,
   PlotlyChart,
   TextInput,
+  Typography,
 } from '../../shared/react';
 import { emitTelemetry, getTelemetryState } from '../../shared/react/telemetry';
 import { GradientNetworkDiagram } from '../components/GradientNetworkDiagram';
@@ -296,6 +299,32 @@ export function FullNetworkTrainingBlock({ onComplete }: FullNetworkTrainingBloc
         title="现在，让整个网络一起学习"
         subtitle="很多情况下，网络里的所有参数都可以用同样的方法更新。"
       >
+      <section
+        className="gd-react-rigor-note"
+        aria-labelledby="gd-network-objective-title"
+      >
+        <Typography
+          as="h3"
+          variant="h3"
+          tone="accent"
+          id="gd-network-objective-title"
+        >
+          从一个样本推广到真实训练目标
+        </Typography>
+        <Typography variant="bodySmall">
+          本页用一个输入与一个 GT 展示完整更新。真实训练通常先把 m 个训练样本的损失取平均，得到经验风险 J(θ)；其中 θ 统一表示网络中全部可学习参数。
+        </Typography>
+        <MathFormulaBlock ariaLabel="经验风险 J theta 等于 m 个样本损失的平均值，最优参数 theta star 是使 J 最小的参数">
+          <MathFormulaStatic latex="J(\boldsymbol\theta)=\frac{1}{m}\sum_{i=1}^{m}\ell\!\left(y_i,f_{\boldsymbol\theta}(x_i)\right),\qquad \boldsymbol\theta^{*}=\underset{\boldsymbol\theta}{\operatorname{arg\,min}}\;J(\boldsymbol\theta)" />
+        </MathFormulaBlock>
+        <Typography variant="bodySmall">
+          深度学习常从训练集中抽取小批量 Bₜ，用批内平均梯度近似整个训练集的梯度，再同时更新所有参数。本页相当于批量大小为 1 的教学示例。
+        </Typography>
+        <MathFormulaBlock ariaLabel="第 t 步的小批量梯度 g t 等于批内样本梯度的平均值，下一步参数等于当前参数减学习率乘 g t">
+          <MathFormulaStatic latex="\boldsymbol g_t=\frac{1}{|\mathcal B_t|}\sum_{i\in\mathcal B_t}\nabla_{\boldsymbol\theta}\ell_i\!\left(\boldsymbol\theta^{(t)}\right),\qquad \boldsymbol\theta^{(t+1)}=\boldsymbol\theta^{(t)}-\eta_t\boldsymbol g_t" />
+        </MathFormulaBlock>
+      </section>
+
       <div className="gd-react-final-grid">
         <div className="gd-react-control-card gd-target-entry">
           <span className="edu-kicker">设置真实值 GT</span>
@@ -363,6 +392,37 @@ export function FullNetworkTrainingBlock({ onComplete }: FullNetworkTrainingBloc
         target={snapshot.target}
         updating={training}
       />
+
+      <section
+        className="gd-react-rigor-note"
+        aria-labelledby="gd-backprop-title"
+      >
+        <Typography
+          as="h3"
+          variant="h3"
+          tone="accent"
+          id="gd-backprop-title"
+        >
+          反向传播负责求梯度，梯度下降负责更新参数
+        </Typography>
+        <Typography variant="bodySmall">
+          反向传播沿计算图反向应用链式法则，计算每个参数对 Loss 的影响。例如，w₁₁ 通过隐藏量 h₁ 再影响输出 y，因此其梯度由路径上的局部导数相乘得到。
+        </Typography>
+        <MathFormulaBlock ariaLabel="L 对 w11 的偏导等于 L 对 y 的偏导乘 y 对 h1 的偏导乘 h1 对 w11 的偏导">
+          <MathFormulaStatic latex="\frac{\partial L}{\partial w_{11}}=\frac{\partial L}{\partial y}\frac{\partial y}{\partial h_1}\frac{\partial h_1}{\partial w_{11}}" />
+        </MathFormulaBlock>
+        <Typography variant="bodySmall">
+          一轮更新应先在同一组旧参数上计算全部梯度，再同时生成新参数；不能更新一个权重后立刻用它计算另一个权重的本轮梯度，否则实现的就不再是上式所描述的同一步更新。
+        </Typography>
+        <ul className="gd-react-rigor-list">
+          <Typography as="li" variant="bodySmall">
+            梯度接近 0 只说明到达驻点；对非凸神经网络，它不保证是全局最小点，也可能对应鞍点或平坦区域。
+          </Typography>
+          <Typography as="li" variant="bodySmall">
+            训练 Loss 足够低表示优化目标被较好地降低，但模型能否在新样本上表现良好仍需验证集或测试集评估。
+          </Typography>
+        </ul>
+      </section>
 
       {targetCommitted && readyToComplete && (
         <Callout

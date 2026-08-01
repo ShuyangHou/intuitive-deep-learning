@@ -12,9 +12,12 @@ import {
   Feedback,
   FormulaBlock,
   FormulaTerm,
+  MathFormulaBlock,
+  MathFormulaStatic,
   NoticeStrip,
   PlotlyChart,
   RangeControl,
+  Typography,
   emitTelemetry,
   getTelemetryState,
 } from '../../shared/react';
@@ -1178,6 +1181,70 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
             />
           )}
         </div>
+
+        {derivativesComplete && (
+          <section
+            className="gd-react-rigor-note"
+            aria-labelledby="gd-chain-rule-title"
+          >
+            <Typography
+              as="h3"
+              variant="h3"
+              tone="accent"
+              id="gd-chain-rule-title"
+            >
+              链式法则把局部变化率连成参数梯度
+            </Typography>
+            <Typography variant="bodySmall">
+              上面的三个偏导不是彼此独立的答案。对任一输出层权重 vⱼ，Loss 对权重的偏导等于“Loss 对预测的变化率”与“预测对该权重的变化率”之积。
+            </Typography>
+            <MathFormulaBlock ariaLabel="L 对 v j 的偏导等于 L 对 y 的偏导乘 y 对 v j 的偏导，并且 y 对 v j 的偏导等于 h j">
+              <MathFormulaStatic latex="\frac{\partial L}{\partial v_j}=\frac{\partial L}{\partial y}\frac{\partial y}{\partial v_j},\qquad \frac{\partial y}{\partial v_j}=h_j,\qquad j\in\{1,2\}" />
+            </MathFormulaBlock>
+            <Typography variant="bodySmall">
+              当前 y &lt; GT，所以 ∂L/∂y = −1；与 h₁ = 3、h₂ = 1 相乘后，两个权重的梯度分别为 −3 和 −1。更新规则减去负梯度，因此两个权重都会增大。
+            </Typography>
+            <MathFormulaBlock ariaLabel="当前关于 v1 和 v2 的梯度向量等于负三和负一，下一步参数等于当前参数减学习率乘梯度">
+              <MathFormulaStatic latex="\nabla_{\boldsymbol v}L=\begin{bmatrix}-1\times3\\-1\times1\end{bmatrix}=\begin{bmatrix}-3\\-1\end{bmatrix},\qquad \boldsymbol v^{(t+1)}=\boldsymbol v^{(t)}-\eta_t\nabla_{\boldsymbol v}L\!\left(\boldsymbol v^{(t)}\right)" />
+            </MathFormulaBlock>
+            <Typography variant="caption" tone="muted">
+              严格地说，L1 Loss 在 y = GT 处不可导；此时可使用区间 [−1, 1] 内的次梯度。本演示在 Loss 足够小时停止更新，避免在折点附近反复跳动。
+            </Typography>
+          </section>
+        )}
+
+        {activity.learningRateStarted && (
+          <section
+            className="gd-react-rigor-note"
+            aria-labelledby="gd-learning-rate-title"
+          >
+            <Typography
+              as="h3"
+              variant="h3"
+              tone="accent"
+              id="gd-learning-rate-title"
+            >
+              负梯度给方向，学习率决定这一步是否可靠
+            </Typography>
+            <Typography variant="bodySmall">
+              对可微目标 J，在当前位置附近做一阶近似，并令参数变化量 Δθ = −η∇J，可得到目标值下降的局部解释。
+            </Typography>
+            <MathFormulaBlock ariaLabel="J 在 theta 加 delta theta 处近似等于 J theta 加梯度与 delta theta 的内积，代入负学习率乘梯度后近似等于 J theta 减学习率乘梯度范数平方">
+              <MathFormulaStatic latex="J(\boldsymbol\theta+\Delta\boldsymbol\theta)\approx J(\boldsymbol\theta)+\nabla J(\boldsymbol\theta)^{\!\top}\Delta\boldsymbol\theta,\qquad J(\boldsymbol\theta-\eta\nabla J)\approx J(\boldsymbol\theta)-\eta\lVert\nabla J\rVert_2^2" />
+            </MathFormulaBlock>
+            <ul className="gd-react-rigor-list">
+              <Typography as="li" variant="bodySmall">
+                η = 0 时参数不更新；η 很小时通常较稳定，但需要更多迭代。
+              </Typography>
+              <Typography as="li" variant="bodySmall">
+                η 过大时，一阶近似不再可靠，更新可能越过低点并产生震荡，甚至让 Loss 发散。
+              </Typography>
+              <Typography as="li" variant="bodySmall">
+                负梯度是当前位置的一阶最速下降方向，不等于“任意步长都使 Loss 下降”。
+              </Typography>
+            </ul>
+          </section>
+        )}
 
         <div className="gd-auto-network-card">
           <GradientNetworkDiagram
