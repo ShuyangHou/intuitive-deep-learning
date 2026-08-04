@@ -23,8 +23,8 @@ export interface MigratedModule {
 export const migratedModules: MigratedModule[] = [
   {
     id: 'adaptive-learning-rate-module',
-    title: '从 SGD 到自适应学习率',
-    description: '理解 SGD 的标准更新形式，以及 AdaGrad、Adam 如何根据梯度历史调整步长。',
+    title: '让模型学得更快',
+    description: '从固定步长出发，理解 SGD、Momentum、AdaGrad 与 Adam 如何调整学习步伐。',
     path: '/modules/adaptive-learning-rate',
     badge: '互动教学模块',
     element: <AdaptiveLearningRatePage />,
@@ -76,6 +76,8 @@ export const migratedModules: MigratedModule[] = [
     path: '/modules/formula-tooltip-react',
     badge: '公式实验模块',
     element: <FormulaTooltipPage />,
+  },
+  {
     id: 'gradient-descent-module-react',
     title: '梯度下降导览',
     description: '从手动调节输出层权重，到学习率实验和完整网络参数更新。',

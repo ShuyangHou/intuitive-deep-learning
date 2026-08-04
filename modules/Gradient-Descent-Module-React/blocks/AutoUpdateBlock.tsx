@@ -10,8 +10,9 @@ import {
   Callout,
   ContentBlock,
   Feedback,
-  FormulaBlock,
-  FormulaTerm,
+  MathFormulaBlock,
+  MathFormulaStatic,
+  MathFormulaTerm,
   NoticeStrip,
   PlotlyChart,
   RangeControl,
@@ -955,82 +956,49 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
                 ].filter(Boolean).join(' ')}
               >
                 <div className="gd-math-problem">
-                  <FormulaBlock
-                    className="gd-update-rule-card"
-                    ariaLabel={derivativesComplete ? '代入结果' : '更新规则'}
-                    formula={(
-                      <>
-                        <span className="edu-kicker gd-rule-label">
-                          {derivativesComplete ? '代入结果' : '更新规则'}
-                        </span>
-                        <span className="gd-rule-formula">
-                          <FormulaTerm tooltip="本轮更新后的参数">新权重</FormulaTerm>
-                          <i>=</i>
-                          <FormulaTerm tooltip="本轮更新前的参数">旧权重</FormulaTerm>
-                          <i>−</i>
-                          <FormulaTerm tooltip="Loss 对当前权重的变化率">偏导</FormulaTerm>
-                        </span>
-                        {derivativesComplete && (
-                          <span className="gd-rule-result">
-                            <span className="gd-confirm-equations">
-                              <span className="gd-weight-equation">
-                                <strong>v₁(new)</strong>
-                                <span>=</span>
-                                <code>
-                                  {compact(activity.weights.v1)} − (
-                                  {compact(scaledDirection)} × 3) =
-                                  {' '}
-                                  <b>{compact(nextPreview.weights.v1)}</b>
-                                </code>
-                              </span>
-                              <span className="gd-weight-equation">
-                                <strong>v₂(new)</strong>
-                                <span>=</span>
-                                <code>
-                                  {compact(activity.weights.v2)} − (
-                                  {compact(scaledDirection)} × 1) =
-                                  {' '}
-                                  <b>{compact(nextPreview.weights.v2)}</b>
-                                </code>
-                              </span>
-                            </span>
-                          </span>
-                        )}
-                        {derivativesComplete
-                          && !activity.learningRateStarted
-                          && !waitingForReflection
-                          && !activity.completed && (
-                          <span className="gd-update-rule-actions">
-                            <Button
-                              key="initial-auto-update"
-                              variant="primary"
-                              hint={activity.history.length === 0}
-                              loading={isUpdating}
-                              disabled={!canUpdate}
-                              onClick={updateOnce}
-                            >
-                              执行一次参数更新
-                            </Button>
-                          </span>
-                        )}
-                      </>
-                    )}
-                  />
+                  <span className="edu-kicker gd-rule-label">
+                    {derivativesComplete ? '代入结果' : '更新规则'}
+                  </span>
+                  <MathFormulaBlock className="gd-update-rule-card" ariaLabel={derivativesComplete ? '代入结果' : '更新规则'}>
+                    <MathFormulaTerm latex="\text{新权重}" tooltip="本轮更新后的参数" />
+                    <MathFormulaStatic latex="=" />
+                    <MathFormulaTerm latex="\text{旧权重}" tooltip="本轮更新前的参数" />
+                    <MathFormulaStatic latex="-" />
+                    <MathFormulaTerm latex="\text{偏导}" tooltip="Loss 对当前权重的变化率" />
+                  </MathFormulaBlock>
+                  {derivativesComplete && (
+                    <div className="gd-confirm-equations">
+                      <MathFormulaBlock ariaLabel="v1 权重代入结果">
+                        <MathFormulaTerm latex={`v_1^{\\mathrm{new}}=${compact(activity.weights.v1)}-(${compact(scaledDirection)}\\cdot3)=${compact(nextPreview.weights.v1)}`} tooltip="第一个输出权重的一步更新" />
+                      </MathFormulaBlock>
+                      <MathFormulaBlock ariaLabel="v2 权重代入结果">
+                        <MathFormulaTerm latex={`v_2^{\\mathrm{new}}=${compact(activity.weights.v2)}-(${compact(scaledDirection)}\\cdot1)=${compact(nextPreview.weights.v2)}`} tooltip="第二个输出权重的一步更新" />
+                      </MathFormulaBlock>
+                    </div>
+                  )}
+                  {derivativesComplete
+                    && !activity.learningRateStarted
+                    && !waitingForReflection
+                    && !activity.completed && (
+                    <span className="gd-update-rule-actions">
+                      <Button
+                        key="initial-auto-update"
+                        variant="primary"
+                        hint={activity.history.length === 0}
+                        loading={isUpdating}
+                        disabled={!canUpdate}
+                        onClick={updateOnce}
+                      >
+                        执行一次参数更新
+                      </Button>
+                    </span>
+                  )}
 
                   {!derivativesComplete && (
                     <div className="gd-known-formulas">
-                      <p className="edu-body">
-                        <span className="edu-helper">输入</span>
-                        <code className="edu-code">h₁ = 3，h₂ = 1</code>
-                      </p>
-                      <p className="edu-body">
-                        <span className="edu-helper">输出</span>
-                        <code className="edu-code">y = v₁×h₁ + v₂×h₂</code>
-                      </p>
-                      <p className="edu-body">
-                        <span className="edu-helper">损失</span>
-                        <code className="edu-code">L1_loss = |y - GT|</code>
-                      </p>
+                      <MathFormulaBlock ariaLabel="隐藏层输入值"><MathFormulaTerm latex="h_1=3,\ h_2=1" tooltip="两个隐藏层输出的当前值" /></MathFormulaBlock>
+                      <MathFormulaBlock ariaLabel="输出层计算"><MathFormulaTerm latex="y=v_1h_1+v_2h_2" tooltip="输出是权重与隐藏层值乘积的和" /></MathFormulaBlock>
+                      <MathFormulaBlock ariaLabel="L1 损失"><MathFormulaTerm latex="L_1=\lvert y-\mathrm{GT}\rvert" tooltip="预测输出与真实目标之差的绝对值" /></MathFormulaBlock>
                     </div>
                   )}
                 </div>
