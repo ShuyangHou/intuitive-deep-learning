@@ -14,6 +14,25 @@ export function GradientBlock({ onComplete }: LessonBlockProps) {
   return (
     <ContentBlock className="lg-react-block" title="计算 L1 与 L2 的梯度" subtitle="损失告诉我们错了多少；梯度进一步告诉模型预测值应该往哪个方向改，以及需要多强的修正。">
       <Callout tone="blue" label="怎样读梯度" text="梯度的正负表示修正方向，绝对值表示当前误差产生的修正强度。训练时会沿梯度的反方向更新预测。" />
+      <section className="lg-react-rigor-note lg-react-rigor-note--compact" aria-labelledby="lg-calculus-definition-title">
+        <Typography as="h3" variant="h3" tone="accent" id="lg-calculus-definition-title">先区分导数、偏导数和梯度</Typography>
+        <Typography variant="bodySmall">这三个词都描述局部变化率，但它们的输入对象不同。先写清“对谁求导”，才能判断结果是一个数还是一个向量。</Typography>
+        <dl className="lg-react-definition-list">
+          <div>
+            <Typography as="dt" variant="label" tone="accent">导数</Typography>
+            <Typography as="dd" variant="bodySmall">单变量函数在某一点的局部变化率。输入发生很小变化时，导数给出输出一阶变化的比例。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">偏导数</Typography>
+            <Typography as="dd" variant="bodySmall">多变量函数只改变其中一个变量、暂时固定其他变量时得到的变化率。本页的 ∂ℓ/∂ŷ 是损失关于预测值的一个偏导数。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">梯度</Typography>
+            <Typography as="dd" variant="bodySmall">标量目标关于一组变量的全部偏导数组成的向量。后续训练真正需要的是损失关于所有模型参数 θ 的梯度，而不只是关于预测 ŷ 的一个偏导数。</Typography>
+          </div>
+        </dl>
+        <Typography variant="caption" tone="muted">本页先求 ∂ℓ/∂ŷ；梯度下降模块再通过链式法则把这一变化率传到每个权重，得到关于参数的梯度。</Typography>
+      </section>
       <section className="lg-react-rigor-note lg-react-rigor-note--compact" aria-labelledby="lg-gradient-variable-title">
         <Typography as="h3" variant="h3" tone="accent" id="lg-gradient-variable-title">求导变量必须写清楚</Typography>
         <Typography variant="bodySmall">下面把残差定义为 e = ŷ − y，并对预测值 ŷ 求导。因为真实值 y 在训练样本中是常量，所以 ∂e/∂ŷ = 1。</Typography>

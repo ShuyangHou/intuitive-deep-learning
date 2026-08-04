@@ -30,10 +30,38 @@ export function LossCalculationBlock({ onComplete }: LessonBlockProps) {
             <MathFormulaStatic latex="\ell_{\mathrm{L1}}^{(i)}=|e_i|,\qquad \ell_{\mathrm{L2}}^{(i)}=e_i^2" />
           </MathFormulaBlock>
         </div>
+        <dl className="lg-react-definition-list">
+          <div>
+            <Typography as="dt" variant="label" tone="accent">残差</Typography>
+            <Typography as="dd" variant="bodySmall">预测值减真实值所得的有符号误差。正号表示预测偏高，负号表示预测偏低，绝对值表示偏离目标的大小；直接平均残差可能让正负误差相互抵消。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">绝对误差</Typography>
+            <Typography as="dd" variant="bodySmall">残差的绝对值。它随误差大小线性增长，因此每增加一个单位误差，损失增加的量保持一致。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">平方误差</Typography>
+            <Typography as="dd" variant="bodySmall">残差的平方。它随误差大小二次增长，因此较大的残差会获得更高权重，也更容易主导总体训练目标。</Typography>
+          </div>
+        </dl>
         <Typography variant="bodySmall">本页题目计算的是一个样本的损失。真正训练模型时，需要把 m 个训练样本的损失取平均，得到关于参数 θ 的经验风险（也常称训练目标或代价函数）。</Typography>
         <MathFormulaBlock ariaLabel="训练目标 J theta 等于 m 个样本损失的平均值，最优参数 theta star 是使训练目标最小的参数">
           <MathFormulaStatic latex="J(\theta)=\frac{1}{m}\sum_{i=1}^{m}\ell\!\left(y_i,f_{\theta}(x_i)\right),\qquad \theta^{*}=\underset{\theta}{\operatorname{arg\,min}}\;J(\theta)" />
         </MathFormulaBlock>
+        <dl className="lg-react-definition-list">
+          <div>
+            <Typography as="dt" variant="label" tone="accent">经验风险</Typography>
+            <Typography as="dd" variant="bodySmall">训练集中全部样本损失的平均值 J(θ)。它是可以由现有数据计算并交给优化算法最小化的目标，名称中的“经验”强调它来自有限训练样本。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">期望风险</Typography>
+            <Typography as="dd" variant="bodySmall">模型在真实但未知的数据分布上的平均损失，也称总体风险。学习真正关心的是这一量，但训练时通常只能用经验风险近似它。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">经验风险最小化</Typography>
+            <Typography as="dd" variant="bodySmall">在候选参数中寻找使训练集平均损失尽可能小的参数。训练误差降低说明优化取得进展，但只有验证集或测试集表现才能进一步判断泛化能力。</Typography>
+          </div>
+        </dl>
         <Typography variant="caption" tone="muted">“损失”严格地说常指单样本量 ℓ，“经验风险”指训练集平均量 J；工程语境中二者也经常统称为 loss。本模块沿用原有命名，将绝对误差称为 L1 Loss、平方误差称为 L2 Loss；取训练集平均后通常称为 MAE、MSE。</Typography>
       </section>
       <Callout tone="orange" label="你的任务" text="先算出当前预测的 L1、L2 损失。计算正确后，再解释两种损失的区别。" />

@@ -35,6 +35,22 @@
   margin: 0;
 }
 .lg-react-symbol-list div { display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: baseline; }
+.lg-react-definition-list {
+  display: grid;
+  max-width: 72ch;
+  margin: 0;
+  border-top: 1px solid var(--ui-border);
+}
+.lg-react-definition-list > div {
+  display: grid;
+  grid-template-columns: minmax(112px, 142px) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 14px;
+  border-bottom: 1px solid var(--ui-border);
+  padding-block: 10px;
+}
+.lg-react-definition-list dt,
+.lg-react-definition-list dd { margin: 0; }
 .lg-react-formula-stack { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .lg-react-rigor-note .math-formula-block,
 .lg-react-technical-note .math-formula-block {
@@ -71,6 +87,7 @@
 @media (max-width: 720px) {
   .lg-react-symbol-list,
   .lg-react-formula-stack { grid-template-columns: 1fr; }
+  .lg-react-definition-list > div { grid-template-columns: 1fr; gap: 4px; }
   .lg-react-rigor-note .math-formula,
   .lg-react-technical-note .math-formula { font-size: 18px; }
 }

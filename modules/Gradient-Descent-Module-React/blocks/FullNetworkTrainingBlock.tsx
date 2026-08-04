@@ -314,6 +314,28 @@ export function FullNetworkTrainingBlock({ onComplete }: FullNetworkTrainingBloc
         <Typography variant="bodySmall">
           本页用一个输入与一个 GT 展示完整更新。真实训练通常先把 m 个训练样本的损失取平均，得到经验风险 J(θ)；其中 θ 统一表示网络中全部可学习参数。
         </Typography>
+        <dl className="gd-react-definition-list">
+          <div>
+            <Typography as="dt" variant="label" tone="accent">训练样本</Typography>
+            <Typography as="dd" variant="bodySmall">一对用于学习的输入 xᵢ 与目标 yᵢ。单样本梯度只反映模型在这一对数据上的修正方向，可能与整个训练集的平均方向存在差异。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">批量梯度下降</Typography>
+            <Typography as="dd" variant="bodySmall">每次更新都使用整个训练集计算经验风险的准确梯度。方向确定，但当训练集很大时，一次更新的计算和存储代价较高。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">随机梯度下降</Typography>
+            <Typography as="dd" variant="bodySmall">每次随机抽取一个训练样本，用该样本的梯度估计训练集梯度并更新参数。单次计算成本低，但梯度估计的波动通常较大。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">小批量梯度下降</Typography>
+            <Typography as="dd" variant="bodySmall">每次使用随机抽取的一小批样本的平均梯度更新参数，是深度学习中最常见的训练方式。批量大小在梯度估计噪声、计算吞吐和显存占用之间形成权衡。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">迭代与轮次</Typography>
+            <Typography as="dd" variant="bodySmall">一次小批量更新称为一次迭代；训练数据被完整遍历一次通常称为一个 epoch。二者不能混用，一个 epoch 往往包含多次参数更新。</Typography>
+          </div>
+        </dl>
         <MathFormulaBlock ariaLabel="经验风险 J theta 等于 m 个样本损失的平均值，最优参数 theta star 是使 J 最小的参数">
           <MathFormulaStatic latex="J(\boldsymbol\theta)=\frac{1}{m}\sum_{i=1}^{m}\ell\!\left(y_i,f_{\boldsymbol\theta}(x_i)\right),\qquad \boldsymbol\theta^{*}=\underset{\boldsymbol\theta}{\operatorname{arg\,min}}\;J(\boldsymbol\theta)" />
         </MathFormulaBlock>
@@ -408,6 +430,24 @@ export function FullNetworkTrainingBlock({ onComplete }: FullNetworkTrainingBloc
         <Typography variant="bodySmall">
           反向传播沿计算图反向应用链式法则，计算每个参数对 Loss 的影响。例如，w₁₁ 通过隐藏量 h₁ 再影响输出 y，因此其梯度由路径上的局部导数相乘得到。
         </Typography>
+        <dl className="gd-react-definition-list">
+          <div>
+            <Typography as="dt" variant="label" tone="accent">前向传播</Typography>
+            <Typography as="dd" variant="bodySmall">按照网络连接方向，由输入和当前参数逐层计算隐藏表示、预测以及损失。它回答当前参数下模型输出什么。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">反向传播</Typography>
+            <Typography as="dd" variant="bodySmall">在已经完成的前向计算图上，反向复用链式法则，高效求出损失关于各参数的梯度。它是一种求导算法，本身不规定参数应该更新多大。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">优化器</Typography>
+            <Typography as="dd" variant="bodySmall">接收梯度和自身状态，并产生新参数的更新规则。最基本的梯度下降只使用当前梯度与学习率；更复杂的优化器还可能利用历史梯度。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">端到端训练</Typography>
+            <Typography as="dd" variant="bodySmall">从最终训练目标出发，让梯度通过整个可微网络传到各层，并联合更新所有可学习参数，而不是分别为每层手工指定目标。</Typography>
+          </div>
+        </dl>
         <MathFormulaBlock ariaLabel="L 对 w11 的偏导等于 L 对 y 的偏导乘 y 对 h1 的偏导乘 h1 对 w11 的偏导">
           <MathFormulaStatic latex="\frac{\partial L}{\partial w_{11}}=\frac{\partial L}{\partial y}\frac{\partial y}{\partial h_1}\frac{\partial h_1}{\partial w_{11}}" />
         </MathFormulaBlock>

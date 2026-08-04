@@ -41,6 +41,27 @@
   max-width: 72ch;
 }
 
+.gd-react-definition-list {
+  display: grid;
+  max-width: 72ch;
+  margin: 0;
+  border-top: 1px solid var(--ui-border);
+}
+
+.gd-react-definition-list > div {
+  display: grid;
+  grid-template-columns: minmax(112px, 148px) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 14px;
+  border-bottom: 1px solid var(--ui-border);
+  padding-block: 10px;
+}
+
+.gd-react-definition-list dt,
+.gd-react-definition-list dd {
+  margin: 0;
+}
+
 .gd-react-rigor-note .math-formula-block {
   width: 100%;
   min-height: 88px;
@@ -715,6 +736,11 @@
 
   .gd-react-rigor-note .math-formula {
     font-size: 18px;
+  }
+
+  .gd-react-definition-list > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 }
 

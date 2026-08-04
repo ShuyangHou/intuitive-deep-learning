@@ -594,6 +594,20 @@ export function ManualTuningBlock({ onComplete }: ManualTuningBlockProps) {
             <Typography variant="bodySmall">
               沿用本页记号：y 表示网络预测，GT = {MANUAL_TARGET} 表示真实目标，隐藏层输出 h₁ = 3、h₂ = 1 保持不变；当前需要学习的参数只有两个输出层权重 v₁、v₂。
             </Typography>
+            <dl className="gd-react-definition-list">
+              <div>
+                <Typography as="dt" variant="label" tone="accent">模型参数</Typography>
+                <Typography as="dd" variant="bodySmall">由训练过程调整、并决定模型输入输出关系的数值。本阶段只有 v₁、v₂ 是待学习参数；输入和隐藏层输出被固定，因此不属于本阶段的优化变量。</Typography>
+              </div>
+              <div>
+                <Typography as="dt" variant="label" tone="accent">目标函数</Typography>
+                <Typography as="dd" variant="bodySmall">把一组参数映射为一个标量代价的函数。这里的目标函数就是当前样本的 L1 Loss；比较两组权重优劣时，必须在同一输入和同一 GT 下比较其目标函数值。</Typography>
+              </div>
+              <div>
+                <Typography as="dt" variant="label" tone="accent">优化</Typography>
+                <Typography as="dd" variant="bodySmall">在允许的参数范围内寻找使目标函数尽可能小的参数。一次调节只是一次候选更新，连续执行“计算方向—更新参数—重新评价”才构成迭代优化过程。</Typography>
+              </div>
+            </dl>
             <MathFormulaBlock ariaLabel="参数向量 theta 由 v1 和 v2 组成，预测 y 等于 v1 h1 加 v2 h2，目标函数 L 等于预测与真实目标之差的绝对值">
               <MathFormulaStatic latex="\boldsymbol{\theta}=\begin{bmatrix}v_1\\v_2\end{bmatrix},\qquad y(\boldsymbol{\theta})=v_1h_1+v_2h_2,\qquad L(\boldsymbol{\theta})=\left|y(\boldsymbol{\theta})-\mathrm{GT}\right|" />
             </MathFormulaBlock>

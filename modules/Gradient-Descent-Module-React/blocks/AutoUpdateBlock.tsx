@@ -936,6 +936,41 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
         title="网络会自己调整参数，让预测更接近真实值"
         subtitle="依次算出误差方向和两个偏导，再观察更新步长如何影响稳定性。"
       >
+        <section
+          className="gd-react-rigor-note"
+          aria-labelledby="gd-gradient-definition-title"
+        >
+          <Typography
+            as="h3"
+            variant="h3"
+            tone="accent"
+            id="gd-gradient-definition-title"
+          >
+            梯度是目标函数关于全部参数的局部变化率
+          </Typography>
+          <Typography variant="bodySmall">
+            自动更新之前，先区分计算过程中出现的四个概念。它们共同回答“当前参数稍微改变时，Loss 会怎样改变”，但各自承担的角色不同。
+          </Typography>
+          <dl className="gd-react-definition-list">
+            <div>
+              <Typography as="dt" variant="label" tone="accent">局部导数</Typography>
+              <Typography as="dd" variant="bodySmall">一个量对另一个量在当前位置的瞬时变化率。它只描述当前位置附近的一阶关系，不直接说明离当前位置很远时函数如何变化。</Typography>
+            </div>
+            <div>
+              <Typography as="dt" variant="label" tone="accent">参数梯度</Typography>
+              <Typography as="dd" variant="bodySmall">Loss 关于所有待学习参数的偏导数组成的向量。每个分量对应一个参数，既给出该参数的局部影响方向，也给出一阶变化强度。</Typography>
+            </div>
+            <div>
+              <Typography as="dt" variant="label" tone="accent">链式法则</Typography>
+              <Typography as="dd" variant="bodySmall">复合函数的求导规则。权重先影响预测、预测再影响 Loss，因此要把计算路径上相邻的局部导数相乘，才能得到 Loss 对权重的偏导。</Typography>
+            </div>
+            <div>
+              <Typography as="dt" variant="label" tone="accent">负梯度方向</Typography>
+              <Typography as="dd" variant="bodySmall">在欧氏长度衡量下，目标函数在当前位置的一阶最速下降方向。它提供局部方向，但是否真的下降还取决于学习率是否足够合适。</Typography>
+            </div>
+          </dl>
+        </section>
+
         <div
           className={[
             'edu-panel',
@@ -1229,6 +1264,24 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
             <Typography variant="bodySmall">
               对可微目标 J，在当前位置附近做一阶近似，并令参数变化量 Δθ = −η∇J，可得到目标值下降的局部解释。
             </Typography>
+            <dl className="gd-react-definition-list">
+              <div>
+                <Typography as="dt" variant="label" tone="accent">学习率 η</Typography>
+                <Typography as="dd" variant="bodySmall">梯度前的正数缩放系数，控制一次参数更新的长度。它是训练算法的超参数，不是由当前网络前向计算直接得到的模型参数。</Typography>
+              </div>
+              <div>
+                <Typography as="dt" variant="label" tone="accent">一次迭代</Typography>
+                <Typography as="dd" variant="bodySmall">使用当前参数完成前向计算、求损失、求梯度并更新参数的一轮过程。更新后的参数属于下一次迭代，不能反过来参与本轮其他梯度的计算。</Typography>
+              </div>
+              <div>
+                <Typography as="dt" variant="label" tone="accent">收敛</Typography>
+                <Typography as="dd" variant="bodySmall">随着迭代继续，参数序列或目标函数值逐渐接近稳定极限。实际训练常用梯度范数、目标变化量或迭代次数作为停止判据；停止不等同于数学上已经收敛，收敛也不保证到达全局最优解。</Typography>
+              </div>
+              <div>
+                <Typography as="dt" variant="label" tone="accent">震荡与发散</Typography>
+                <Typography as="dd" variant="bodySmall">震荡指更新反复越过低值区域；发散指目标值或参数总体远离可接受范围。过大的学习率是常见原因，但损失曲面的尺度和曲率同样会影响稳定性。</Typography>
+              </div>
+            </dl>
             <MathFormulaBlock ariaLabel="J 在 theta 加 delta theta 处近似等于 J theta 加梯度与 delta theta 的内积，代入负学习率乘梯度后近似等于 J theta 减学习率乘梯度范数平方">
               <MathFormulaStatic latex="J(\boldsymbol\theta+\Delta\boldsymbol\theta)\approx J(\boldsymbol\theta)+\nabla J(\boldsymbol\theta)^{\!\top}\Delta\boldsymbol\theta,\qquad J(\boldsymbol\theta-\eta\nabla J)\approx J(\boldsymbol\theta)-\eta\lVert\nabla J\rVert_2^2" />
             </MathFormulaBlock>

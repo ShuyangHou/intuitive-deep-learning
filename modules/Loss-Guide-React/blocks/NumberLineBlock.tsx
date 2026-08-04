@@ -109,6 +109,21 @@ export function NumberLineBlock({ onComplete }: LessonBlockProps) {
           <div><Typography as="dt" variant="code" tone="accent">θ</Typography><Typography as="dd" variant="bodySmall" tone="muted">模型训练时需要学习的全部参数</Typography></div>
           <div><Typography as="dt" variant="code" tone="accent">ℓᵢ</Typography><Typography as="dd" variant="bodySmall" tone="muted">第 i 个样本产生的单样本损失</Typography></div>
         </dl>
+        <dl className="lg-react-definition-list">
+          <div>
+            <Typography as="dt" variant="label" tone="accent">损失函数</Typography>
+            <Typography as="dd" variant="bodySmall">由任务设计者选定的一条评价规则：输入真实目标与模型预测，输出一个标量代价。它规定模型训练时怎样理解“预测得不好”，因此不同任务可以采用不同损失。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">单样本损失</Typography>
+            <Typography as="dd" variant="bodySmall">把一个样本的 yᵢ 与 ŷᵢ 代入损失函数后得到的数值 ℓᵢ。它只描述模型在这个样本上的代价，不能单独代表模型在整个数据集上的表现。</Typography>
+          </div>
+          <div>
+            <Typography as="dt" variant="label" tone="accent">零损失</Typography>
+            <Typography as="dd" variant="bodySmall">对本模块的绝对误差和平方误差，ℓᵢ = 0 当且仅当 ŷᵢ = yᵢ；但“训练样本上损失为零”并不等于模型对未见数据也预测正确。</Typography>
+          </div>
+        </dl>
+        <Typography variant="caption" tone="muted">损失函数不必是数学上的距离。绝对误差满足距离的常见性质；平方误差不满足三角不等式，却仍然是有效且常用的训练损失。因此“损失就是距离”是本页帮助建立直觉的说法，不是损失函数的一般定义。</Typography>
       </section>
       <Callout tone="orange" label="你的任务" text="拖动绿色预测值，让它与红色真实值重合，把 Loss 缩小到 0。" />
       <div className="lg-react-numberline" aria-label="数轴距离演示">
