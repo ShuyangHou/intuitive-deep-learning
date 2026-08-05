@@ -11,8 +11,9 @@ import { AutoUpdateBlock } from '../../modules/Gradient-Descent-Module-React/blo
 import { FullNetworkTrainingBlock } from '../../modules/Gradient-Descent-Module-React/blocks/FullNetworkTrainingBlock';
 import { ManualTuningBlock } from '../../modules/Gradient-Descent-Module-React/blocks/ManualTuningBlock';
 import { ResourcesBlock as GradientResourcesBlock } from '../../modules/Gradient-Descent-Module-React/blocks/ResourcesBlock';
-import { AdvancedBlock } from '../../modules/Loss-Guide-React/blocks/AdvancedBlock';
+import { AdvancedBlock as LossAdvancedBlock } from '../../modules/Loss-Guide-React/blocks/AdvancedBlock';
 import { CrossEntropyBlock } from '../../modules/Loss-Guide-React/blocks/CrossEntropyBlock';
+import { AdvancedBlock as GradientAdvancedBlock } from '../../modules/Gradient-Descent-Module-React/blocks/AdvancedBlock';
 import { GradientBlock } from '../../modules/Loss-Guide-React/blocks/GradientBlock';
 import { LossCalculationBlock } from '../../modules/Loss-Guide-React/blocks/LossCalculationBlock';
 import { NumberLineBlock } from '../../modules/Loss-Guide-React/blocks/NumberLineBlock';
@@ -112,7 +113,11 @@ function CrossEntropyPreview() {
 }
 
 function AdvancedPreview() {
-  return <BlockPreview title="延伸拓展">{() => <AdvancedBlock />}</BlockPreview>;
+  return <BlockPreview title="延伸拓展">{() => <LossAdvancedBlock />}</BlockPreview>;
+}
+
+function GradientAdvancedPreview() {
+  return <BlockPreview title="延伸拓展">{() => <GradientAdvancedBlock />}</BlockPreview>;
 }
 
 function ResourcesPreview() {
@@ -287,6 +292,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/dev/blocks/gradient-descent-module-react/manual-tuning', element: <GradientManualPreview /> },
   { path: '/dev/blocks/gradient-descent-module-react/auto-update', element: <GradientAutoUpdatePreview /> },
   { path: '/dev/blocks/gradient-descent-module-react/full-network', element: <GradientFullNetworkPreview /> },
+  { path: '/dev/blocks/gradient-descent-module-react/advanced', element: <GradientAdvancedPreview /> },
   { path: '/dev/blocks/gradient-descent-module-react/resources', element: <GradientResourcesPreview /> },
   { path: '/dev/blocks/activation-func-module-react/linear-2d', element: <ActivationLinear2DPreview /> },
   { path: '/dev/blocks/activation-func-module-react/linear-3d', element: <ActivationLinear3DPreview /> },

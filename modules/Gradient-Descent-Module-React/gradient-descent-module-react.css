@@ -29,75 +29,6 @@
   min-width: 0;
 }
 
-.gd-react-rigor-note {
-  display: grid;
-  gap: 12px;
-  border-block: 1px solid var(--ui-border);
-  padding-block: 18px;
-}
-
-.gd-react-rigor-note > .ui-typography,
-.gd-react-rigor-list {
-  max-width: 72ch;
-}
-
-.gd-react-definition-list {
-  display: grid;
-  max-width: 72ch;
-  margin: 0;
-  border-top: 1px solid var(--ui-border);
-}
-
-.gd-react-definition-list > div {
-  display: grid;
-  grid-template-columns: minmax(112px, 148px) minmax(0, 1fr);
-  align-items: baseline;
-  gap: 14px;
-  border-bottom: 1px solid var(--ui-border);
-  padding-block: 10px;
-}
-
-.gd-react-definition-list dt,
-.gd-react-definition-list dd {
-  margin: 0;
-}
-
-.gd-react-rigor-note .math-formula-block {
-  width: 100%;
-  min-height: 88px;
-  overflow-x: auto;
-  padding: 14px 16px;
-}
-
-.gd-react-rigor-note .math-formula {
-  display: flex;
-  min-width: min-content;
-  align-items: center;
-  justify-content: center;
-  color: var(--ui-accent);
-  font-size: 22px;
-  white-space: nowrap;
-}
-
-.gd-react-rigor-note .math-formula math-field {
-  display: inline-flex;
-  width: auto;
-  min-width: 0;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  color: inherit;
-  font-size: inherit;
-  pointer-events: none;
-}
-
-.gd-react-rigor-list {
-  display: grid;
-  gap: 6px;
-  margin-block: 0;
-  padding-left: 20px;
-}
-
 .gd-react-manual .edu-task {
   display: flex;
   align-items: baseline;
@@ -340,45 +271,29 @@
 }
 
 .gd-update-rule-card {
+  display: grid;
   width: 100%;
   min-height: 112px;
   box-sizing: border-box;
+  place-items: center;
+  gap: 12px;
   padding-block: 14px;
 }
 
-.gd-update-rule-card > .edu-formula {
-  display: grid;
-  width: 100%;
-  place-items: center;
-  gap: 12px;
-  font-size: 40px;
-  line-height: 1.35;
-}
-
-.gd-update-rule-card .edu-kicker {
+.gd-update-rule-card .gd-rule-label {
   margin-bottom: 0;
   font-family: var(--ui-font-sans);
   font-size: 20px;
   line-height: 1.3;
 }
 
-.gd-rule-formula {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+.gd-update-rule-card .gd-update-rule-formula {
+  min-height: 76px;
+  padding-block: 10px;
 }
 
-.gd-rule-formula i {
-  color: var(--ui-text-muted);
-  font-style: normal;
-}
-
-.gd-guided-update.is-solved .gd-rule-formula {
-  flex-wrap: nowrap;
-  gap: 8px;
-  font-size: clamp(32px, 3vw, 36px);
+.gd-update-rule-card .gd-update-rule-formula .math-formula {
+  font-size: 30px;
 }
 
 .gd-rule-result {
@@ -401,59 +316,39 @@
 }
 
 .gd-weight-equation {
-  display: grid;
+  display: block;
+  width: 100%;
   min-width: 0;
-  grid-template-columns: auto auto minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
+  min-height: 0;
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-sm);
   background: #fff;
   padding: 10px 12px;
 }
 
-.gd-weight-equation strong,
-.gd-weight-equation span,
-.gd-weight-equation code {
-  color: var(--ui-accent);
-  font: 900 17px var(--ui-font-mono);
-}
-
-.gd-weight-equation code {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.gd-weight-equation b {
-  color: var(--ui-success);
+.gd-weight-equation .math-formula {
+  justify-content: flex-start;
+  font-size: 18px;
 }
 
 .gd-known-formulas {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.gd-known-formulas .edu-body {
+.gd-known-formula {
   display: grid;
   min-width: 0;
-  grid-template-columns: 36px minmax(0, 1fr);
-  align-items: center;
-  gap: 7px;
+  align-content: start;
+  gap: 6px;
 }
 
-.gd-known-formulas .edu-code {
-  min-width: 0;
-  border: 1px solid var(--ui-border);
-  border-radius: var(--ui-radius-xs, 8px);
-  background: #fff;
-  color: var(--ui-accent);
-  padding: 7px 10px;
-  font: 850 16px var(--ui-font-mono);
-  white-space: nowrap;
+.gd-known-formula .math-formula-block {
+  min-height: 72px;
+  padding: 10px 12px;
 }
 
-.gd-known-formulas .edu-helper {
+.gd-known-formula .math-formula {
   font-size: 16px;
-  font-weight: 800;
 }
 
 .gd-derivative-question {
@@ -726,29 +621,17 @@
     grid-template-columns: 1fr;
   }
 
-  .gd-update-rule-card > .edu-formula {
-    font-size: 30px;
-  }
-
-  .gd-update-rule-card .edu-kicker {
+  .gd-update-rule-card .gd-rule-label {
     font-size: 18px;
   }
 
-  .gd-react-rigor-note .math-formula {
-    font-size: 18px;
+  .gd-update-rule-card .gd-update-rule-formula .math-formula {
+    font-size: 22px;
   }
 
-  .gd-react-definition-list > div {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
 }
 
 @media (max-width: 640px) {
-  .gd-guided-update.is-solved .gd-rule-formula {
-    flex-wrap: wrap;
-  }
-
   .gd-opening-row {
     grid-template-columns: 1fr;
     gap: 14px;
