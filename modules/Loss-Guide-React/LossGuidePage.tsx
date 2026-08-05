@@ -1,5 +1,7 @@
 import { LessonFlow, ModuleShell, type LessonFlowStep } from '../shared/react';
 import './loss-guide-react.css';
+import { AdvancedBlock } from './blocks/AdvancedBlock';
+import { CrossEntropyBlock } from './blocks/CrossEntropyBlock';
 import { LossCalculationBlock } from './blocks/LossCalculationBlock';
 import { GradientBlock } from './blocks/GradientBlock';
 import { NumberLineBlock } from './blocks/NumberLineBlock';
@@ -8,7 +10,9 @@ import { ResourcesBlock } from './blocks/ResourcesBlock';
 const steps: LessonFlowStep[] = [
   { id: 'number-line', revealMode: 'scroll', render: ({ complete }) => <NumberLineBlock onComplete={complete} /> },
   { id: 'calculation', revealMode: 'cue', render: ({ complete }) => <LossCalculationBlock onComplete={complete} /> },
-  { id: 'gradient', revealMode: 'scroll', completesLesson: true, render: ({ complete }) => <GradientBlock onComplete={complete} /> },
+  { id: 'gradient', revealMode: 'scroll', render: ({ complete }) => <GradientBlock onComplete={complete} /> },
+  { id: 'cross-entropy', revealMode: 'scroll', completesLesson: true, render: ({ complete }) => <CrossEntropyBlock onComplete={complete} /> },
+  { id: 'advanced', revealMode: 'scroll', render: () => <AdvancedBlock /> },
   { id: 'resources', revealMode: 'immediate', render: () => <ResourcesBlock /> },
 ];
 
