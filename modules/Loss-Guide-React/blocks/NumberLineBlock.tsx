@@ -3,7 +3,9 @@ import { Callout } from '../../shared/react/feedback/Callout';
 import { ContentBlock } from '../../shared/react/layout/ContentBlock';
 import { NoticeStrip } from '../../shared/react/feedback/NoticeStrip';
 import { ValueTile } from '../../shared/react/learning/ValueTile';
+import { MathFormulaStatic, MathFormulaTerm } from '../../shared/react/learning/MathFormulaBlock';
 import { emitTelemetry, getTelemetryState } from '../../shared/react/telemetry';
+import { KnowledgePoint, LossDefinitionSection } from './rigor';
 
 export interface LessonBlockProps {
   onComplete: () => void;
@@ -94,7 +96,8 @@ export function NumberLineBlock({ onComplete }: LessonBlockProps) {
   };
 
   return (
-    <ContentBlock className="lg-react-block" title="损失就是距离" subtitle="Loss 衡量真实值和预测值之间差多少。先用一条数轴，把这种差距直接画出来。">
+    <ContentBlock className="lg-react-block" title="用距离直观理解损失" subtitle="先观察预测值与真实值的差距，再看损失函数怎样把差距变成可优化的数值。">
+      <LossDefinitionSection />
       <Callout tone="orange" label="你的任务" text="拖动绿色预测值，让它与红色真实值重合，把 Loss 缩小到 0。" />
       <div className="lg-react-numberline" aria-label="数轴距离演示">
         <svg ref={svgRef} viewBox="0 0 720 170" role="group" aria-label={`数轴互动：预测值 ${prediction.toFixed(1)}，真实值 ${target}`} onPointerMove={drag} onPointerUp={finishDrag} onPointerCancel={finishDrag} onLostPointerCapture={finishDrag}>
@@ -122,8 +125,41 @@ export function NumberLineBlock({ onComplete }: LessonBlockProps) {
           <text x={point} y="151" textAnchor="middle">预测值 {prediction.toFixed(1)}</text>
         </svg>
       </div>
-      <div className="lg-react-value-grid"><ValueTile tone="orange" label="L1 Loss = |真实值 - 预测值|" value={l1.toFixed(1)} /><ValueTile tone="blue" label="L2 Loss = (真实值 - 预测值)²" value={l2.toFixed(1)} /></div>
+      <div className="lg-react-value-grid">
+        <ValueTile
+          tone="orange"
+          label={(
+            <span className="lg-react-inline-formula" aria-label="L1 损失等于预测值与真实值之差的绝对值">
+              <MathFormulaTerm latex="\ell_{\mathrm{L1}}" tooltip="L1 损失：用绝对误差衡量当前预测偏差。" ariaLabel="L1 损失" />
+              <MathFormulaStatic latex="=" />
+              <MathFormulaTerm latex="|\hat{y}-y|" tooltip="预测值与真实值之差的绝对值，只保留偏离大小。" ariaLabel="预测残差的绝对值" />
+            </span>
+          )}
+          value={l1.toFixed(1)}
+        />
+        <ValueTile
+          tone="blue"
+          label={(
+            <span className="lg-react-inline-formula" aria-label="L2 损失等于预测值与真实值之差的平方">
+              <MathFormulaTerm latex="\ell_{\mathrm{L2}}" tooltip="L2 损失：本模块沿用原命名表示平方误差。" ariaLabel="L2 损失" />
+              <MathFormulaStatic latex="=" />
+              <MathFormulaTerm latex="(\hat{y}-y)^2" tooltip="预测残差的平方，会更强地放大较大的偏离。" ariaLabel="预测残差的平方" />
+            </span>
+          )}
+          value={l2.toFixed(1)}
+        />
+      </div>
       <NoticeStrip tone={solved ? 'green' : 'orange'} lead={solved ? '阶段完成：' : '操作提醒：'}>{solved ? '预测值已贴近真实值，Loss 变成 0。' : '拖动绿色预测值，让它贴近红色真实值。'}</NoticeStrip>
+      {!hintActive && !isDragging && (
+        <KnowledgePoint
+          ariaLabel="数轴操作知识点"
+          title={solved ? '知识点：零损失只描述当前样本' : '知识点：残差同时记录大小和方向'}
+        >
+          {solved
+            ? '当前预测与真实值重合，所以这个样本的绝对误差和平方误差都为 0。这只能说明模型在当前样本上没有预测误差，不能据此判断它在其他样本或未见数据上的表现。'
+            : `当前残差 e = ŷ − y = ${(prediction - target).toFixed(1)}，表示预测${prediction < target ? '低于' : '高于'}真实值；L1 = ${l1.toFixed(1)}、L2 = ${l2.toFixed(1)} 则去掉了残差的正负号，只保留偏离程度。`}
+        </KnowledgePoint>
+      )}
     </ContentBlock>
   );
 }

@@ -9,6 +9,7 @@ import {
   Button,
   Feedback,
   RangeControl,
+  Typography,
   emitTelemetry,
   getTelemetryState,
   type TelemetryStateEntry,
@@ -20,6 +21,7 @@ import {
   forwardOutputWeights,
   type OutputWeights,
 } from '../model/gradientMath';
+import { KnowledgePoint, ManualObjectiveSection, WhyGradientDescentSection } from './rigor';
 
 export interface ManualTuningBlockProps {
   onComplete: () => void;
@@ -576,6 +578,8 @@ export function ManualTuningBlock({ onComplete }: ManualTuningBlockProps) {
             </span>
           </div>
 
+          <ManualObjectiveSection target={MANUAL_TARGET} />
+
           <div className="gd-opening-row">
             <div className="gd-scoreboard">
               <div
@@ -624,6 +628,12 @@ export function ManualTuningBlock({ onComplete }: ManualTuningBlockProps) {
             </fieldset>
           </div>
 
+          {directionSolved && (
+            <KnowledgePoint ariaLabel="权重方向知识点" title="知识点：先确定输出方向，再确定参数方向">
+              当前预测 y 小于 GT，所以首先需要让 y 增大。因为 h₁、h₂ 都为正数，增大 v₁ 或 v₂ 都会增大输出；如果某个输入系数为负数，相同的权重变化就会产生相反影响。
+            </KnowledgePoint>
+          )}
+
           <GradientNetworkDiagram
             mode="output"
             weights={weights}
@@ -633,6 +643,12 @@ export function ManualTuningBlock({ onComplete }: ManualTuningBlockProps) {
               v2: renderWeightControl('v2', 'v₂'),
             }}
           />
+
+          {impactRevealed && (
+            <KnowledgePoint ariaLabel="权重调节知识点" title="知识点：同样的权重变化不一定产生同样的输出变化">
+              本页满足 Δy = 3Δv₁ + Δv₂。v₁ 每改变 0.1，输出改变 0.3；v₂ 每改变 0.1，输出只改变 0.1。前向计算中与权重相乘的数值决定了它对输出的局部敏感度。
+            </KnowledgePoint>
+          )}
 
           {impactRevealed && (
             <fieldset
@@ -658,6 +674,13 @@ export function ManualTuningBlock({ onComplete }: ManualTuningBlockProps) {
               />
             </fieldset>
           )}
+          {impactSolved && (
+            <KnowledgePoint ariaLabel="参数敏感度知识点" title="知识点：参数影响大小会进入对应的梯度分量">
+              因为 ∂y/∂v₁ = h₁ = 3、∂y/∂v₂ = h₂ = 1，损失对 v₁ 的局部变化通常是 v₂ 的 3 倍。这个比例来自当前前向值，而不是权重名称或所在位置。
+            </KnowledgePoint>
+          )}
+
+          {impactSolved && <WhyGradientDescentSection />}
         </div>
       </section>
     </div>

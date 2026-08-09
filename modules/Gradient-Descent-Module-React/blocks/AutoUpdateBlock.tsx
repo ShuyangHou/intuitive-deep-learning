@@ -16,6 +16,7 @@ import {
   NoticeStrip,
   PlotlyChart,
   RangeControl,
+  Typography,
   emitTelemetry,
   getTelemetryState,
 } from '../../shared/react';
@@ -28,6 +29,15 @@ import {
   type OutputWeights,
 } from '../model/gradientMath';
 import { reviewOscillationAnswer } from '../services/oscillationFeedback';
+import {
+  ChainRuleSection,
+  GradientClippingSection,
+  GradientDefinitionSection,
+  KnowledgePoint,
+  LearningRateSection,
+  MomentumSection,
+  OptimizationLandscapeSection,
+} from './rigor';
 
 const ACTIVITY_STATE_KEY = 'activity:gd-auto';
 const COMPLETE_LOSS_THRESHOLD = 0.005;
@@ -581,6 +591,7 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
     && !activity.learningRateStarted;
   const waitingForReflection = activity.history.length >= 5
     && !activity.learningRateStarted;
+  const latestUpdate = activity.history[activity.history.length - 1] ?? null;
   const canUpdate = hydrated
     && derivativesComplete
     && !waitingForReflection
@@ -934,6 +945,8 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
         title="网络会自己调整参数，让预测更接近真实值"
         subtitle="依次算出误差方向和两个偏导，再观察更新步长如何影响稳定性。"
       >
+        <GradientDefinitionSection />
+
         <div
           className={[
             'edu-panel',
@@ -956,52 +969,103 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
                 ].filter(Boolean).join(' ')}
               >
                 <div className="gd-math-problem">
-                  <span className="edu-kicker gd-rule-label">
-                    {derivativesComplete ? '代入结果' : '更新规则'}
-                  </span>
-                  <MathFormulaBlock className="gd-update-rule-card" ariaLabel={derivativesComplete ? '代入结果' : '更新规则'}>
-                    <MathFormulaTerm latex="\text{新权重}" tooltip="本轮更新后的参数" />
-                    <MathFormulaStatic latex="=" />
-                    <MathFormulaTerm latex="\text{旧权重}" tooltip="本轮更新前的参数" />
-                    <MathFormulaStatic latex="-" />
-                    <MathFormulaTerm latex="\text{偏导}" tooltip="Loss 对当前权重的变化率" />
-                  </MathFormulaBlock>
-                  {derivativesComplete && (
-                    <div className="gd-confirm-equations">
-                      <MathFormulaBlock ariaLabel="v1 权重代入结果">
-                        <MathFormulaTerm latex={`v_1^{\\mathrm{new}}=${compact(activity.weights.v1)}-(${compact(scaledDirection)}\\cdot3)=${compact(nextPreview.weights.v1)}`} tooltip="第一个输出权重的一步更新" />
-                      </MathFormulaBlock>
-                      <MathFormulaBlock ariaLabel="v2 权重代入结果">
-                        <MathFormulaTerm latex={`v_2^{\\mathrm{new}}=${compact(activity.weights.v2)}-(${compact(scaledDirection)}\\cdot1)=${compact(nextPreview.weights.v2)}`} tooltip="第二个输出权重的一步更新" />
-                      </MathFormulaBlock>
-                    </div>
-                  )}
-                  {derivativesComplete
-                    && !activity.learningRateStarted
-                    && !waitingForReflection
-                    && !activity.completed && (
-                    <span className="gd-update-rule-actions">
-                      <Button
-                        key="initial-auto-update"
-                        variant="primary"
-                        hint={activity.history.length === 0}
-                        loading={isUpdating}
-                        disabled={!canUpdate}
-                        onClick={updateOnce}
-                      >
-                        执行一次参数更新
-                      </Button>
-                    </span>
-                  )}
+                  <div className="edu-formula-block gd-update-rule-card" aria-label={derivativesComplete ? '代入结果' : '更新规则'}>
+                    <Typography as="span" variant="h3" tone="accent" className="gd-rule-label">
+                      {derivativesComplete ? '代入结果' : '更新规则'}
+                    </Typography>
+                    <MathFormulaBlock className="gd-update-rule-formula" ariaLabel="下一步权重等于当前权重减学习率乘当前梯度">
+                      <MathFormulaTerm latex="\boldsymbol v^{(t+1)}" tooltip="本轮更新后得到的新权重。" ariaLabel="下一步权重" />
+                      <MathFormulaStatic latex="=" />
+                      <MathFormulaTerm latex="\boldsymbol v^{(t)}" tooltip="本轮更新开始时使用的旧权重。" ariaLabel="当前权重" />
+                      <MathFormulaStatic latex="-" />
+                      <MathFormulaTerm latex="\eta_t" tooltip="ηₜ：本轮学习率，控制参数更新步长。" ariaLabel="当前学习率" tone="warm" />
+                      <MathFormulaTerm latex="\nabla_{\boldsymbol v}L" tooltip="损失关于当前权重的梯度，给出局部上升最快方向。" ariaLabel="损失对当前权重的梯度" />
+                    </MathFormulaBlock>
+                    {derivativesComplete && (
+                      <div className="gd-rule-result">
+                        <div className="gd-confirm-equations">
+                          <MathFormulaBlock className="gd-weight-equation" ariaLabel="代入数值后的 v1 更新">
+                            <MathFormulaTerm latex="v_1^{(t+1)}" tooltip="更新后的第一个输出层权重。" ariaLabel="更新后的 v1" />
+                            <MathFormulaStatic latex="=" />
+                            <MathFormulaTerm latex={`${compact(activity.weights.v1)}-\\left(${compact(scaledDirection)}\\times3\\right)`} tooltip="旧权重减去缩放后的梯度分量。" ariaLabel="v1 的数值更新计算" />
+                            <MathFormulaStatic latex="=" />
+                            <MathFormulaTerm latex={compact(nextPreview.weights.v1)} tooltip="本次更新得到的新 v1。" ariaLabel="新的 v1" tone="warm" />
+                          </MathFormulaBlock>
+                          <MathFormulaBlock className="gd-weight-equation" ariaLabel="代入数值后的 v2 更新">
+                            <MathFormulaTerm latex="v_2^{(t+1)}" tooltip="更新后的第二个输出层权重。" ariaLabel="更新后的 v2" />
+                            <MathFormulaStatic latex="=" />
+                            <MathFormulaTerm latex={`${compact(activity.weights.v2)}-\\left(${compact(scaledDirection)}\\times1\\right)`} tooltip="旧权重减去缩放后的梯度分量。" ariaLabel="v2 的数值更新计算" />
+                            <MathFormulaStatic latex="=" />
+                            <MathFormulaTerm latex={compact(nextPreview.weights.v2)} tooltip="本次更新得到的新 v2。" ariaLabel="新的 v2" tone="warm" />
+                          </MathFormulaBlock>
+                        </div>
+                      </div>
+                    )}
+                    {derivativesComplete
+                      && !activity.learningRateStarted
+                      && !waitingForReflection
+                      && !activity.completed && (
+                      <div className="gd-update-rule-actions">
+                        <Button
+                          key="initial-auto-update"
+                          variant="primary"
+                          hint={activity.history.length === 0}
+                          loading={isUpdating}
+                          disabled={!canUpdate}
+                          onClick={updateOnce}
+                        >
+                          执行一次参数更新
+                        </Button>
+                      </div>
+                    )}
+                  </div>
 
                   {!derivativesComplete && (
                     <div className="gd-known-formulas">
-                      <MathFormulaBlock ariaLabel="隐藏层输入值"><MathFormulaTerm latex="h_1=3,\ h_2=1" tooltip="两个隐藏层输出的当前值" /></MathFormulaBlock>
-                      <MathFormulaBlock ariaLabel="输出层计算"><MathFormulaTerm latex="y=v_1h_1+v_2h_2" tooltip="输出是权重与隐藏层值乘积的和" /></MathFormulaBlock>
-                      <MathFormulaBlock ariaLabel="L1 损失"><MathFormulaTerm latex="L_1=\lvert y-\mathrm{GT}\rvert" tooltip="预测输出与真实目标之差的绝对值" /></MathFormulaBlock>
+                      <div className="gd-known-formula">
+                        <Typography variant="label" tone="muted">输入</Typography>
+                        <MathFormulaBlock ariaLabel="隐藏层输入 h1 等于三，h2 等于一">
+                          <MathFormulaTerm latex="h_1" tooltip="h₁：进入第一个输出权重的隐藏层数值。" ariaLabel="隐藏层输出 h1" />
+                          <MathFormulaStatic latex="=" />
+                          <MathFormulaTerm latex="3" tooltip="当前 h₁ 的固定数值。" ariaLabel="h1 等于三" />
+                          <MathFormulaStatic latex="," />
+                          <MathFormulaTerm latex="h_2" tooltip="h₂：进入第二个输出权重的隐藏层数值。" ariaLabel="隐藏层输出 h2" />
+                          <MathFormulaStatic latex="=" />
+                          <MathFormulaTerm latex="1" tooltip="当前 h₂ 的固定数值。" ariaLabel="h2 等于一" />
+                        </MathFormulaBlock>
+                      </div>
+                      <div className="gd-known-formula">
+                        <Typography variant="label" tone="muted">输出</Typography>
+                        <MathFormulaBlock ariaLabel="预测 y 等于两个权重与隐藏层输出乘积之和">
+                          <MathFormulaTerm latex="y" tooltip="y：网络当前得到的预测值。" ariaLabel="预测值 y" />
+                          <MathFormulaStatic latex="=" />
+                          <MathFormulaTerm latex="v_1h_1" tooltip="第一个输出权重与对应隐藏层输出的乘积。" ariaLabel="v1 乘 h1" />
+                          <MathFormulaStatic latex="+" />
+                          <MathFormulaTerm latex="v_2h_2" tooltip="第二个输出权重与对应隐藏层输出的乘积。" ariaLabel="v2 乘 h2" />
+                        </MathFormulaBlock>
+                      </div>
+                      <div className="gd-known-formula">
+                        <Typography variant="label" tone="muted">损失</Typography>
+                        <MathFormulaBlock ariaLabel="L1 损失等于预测与真实目标之差的绝对值">
+                          <MathFormulaTerm latex="\ell_{\mathrm{L1}}" tooltip="当前样本的 L1 损失。" ariaLabel="L1 损失" />
+                          <MathFormulaStatic latex="=" />
+                          <MathFormulaTerm latex="|y-\mathrm{GT}|" tooltip="预测值与真实目标 GT 之差的绝对值。" ariaLabel="预测与真实目标的绝对误差" />
+                        </MathFormulaBlock>
+                      </div>
                     </div>
                   )}
                 </div>
+
+                {activity.derivativeSolved > 0 && !derivativesComplete && (
+                  <KnowledgePoint
+                    ariaLabel="局部导数知识点"
+                    title={activity.derivativeSolved === 1 ? '知识点：L1 对预测的导数先决定误差方向' : '知识点：线性输出对权重的偏导就是对应输入'}
+                  >
+                    {activity.derivativeSolved === 1
+                      ? '当前 y < GT，提高 y 会让 L1 Loss 等量减小，因此 ∂L/∂y = −1。负号表示若只改变预测值，应向增大的方向修正。'
+                      : '由 y = v₁h₁ + v₂h₂，对 v₁ 求偏导时固定 v₂，得到 ∂y/∂v₁ = h₁ = 3。这个结果衡量 v₁ 在当前位置对输出的局部影响。'}
+                  </KnowledgePoint>
+                )}
 
                 {activity.derivativeSolved < 3 && (() => {
                   const questions = [
@@ -1041,6 +1105,12 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
                     />
                   );
                 })()}
+
+                {derivativesComplete && (
+                  <KnowledgePoint ariaLabel="链式法则准备知识点" title="知识点：三个局部导数需要沿计算路径组合">
+                    最后一个答案给出 ∂y/∂v₂ = h₂ = 1。现在已有 ∂L/∂y、∂y/∂v₁、∂y/∂v₂；分别相乘后，才能得到 Loss 关于两个权重的完整梯度分量。
+                  </KnowledgePoint>
+                )}
 
                 {oscillating && (
                   <NoticeStrip className="gd-oscillation-cue" tone="orange" lead="注意：">
@@ -1101,6 +1171,27 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
               </section>
             )}
 
+            {latestUpdate && (
+              <KnowledgePoint
+                ariaLabel="参数更新知识点"
+                title={activity.history.length === 1
+                  ? '知识点：一次更新必须使用同一组旧参数'
+                  : activity.learningRateStarted
+                    ? '知识点：学习率改变步长，不改变当前梯度的定义'
+                    : oscillating
+                      ? '知识点：方向正确也可能因为步长过大而震荡'
+                      : '知识点：迭代会重复同一套计算顺序'}
+              >
+                {activity.history.length === 1
+                  ? `第一次更新把 Loss 从 ${format(latestUpdate.before.loss, 3)} 变为 ${format(latestUpdate.after.loss, 3)}。两个权重的梯度都由更新前的同一组参数计算，再同时生成新权重。`
+                  : activity.learningRateStarted
+                    ? `当前步长比例为 ${format(activeRatio, 2)}，这一步把 Loss 从 ${format(latestUpdate.before.loss, 3)} 变为 ${format(latestUpdate.after.loss, 3)}。缩放的是参数移动距离，局部导数和链式法则本身没有改变。`
+                    : oscillating
+                      ? `已经执行 ${activity.history.length} 次更新。固定步长让预测反复越过目标附近的低损失位置，说明负梯度只保证局部方向，不能保证任意步长都下降。`
+                      : `第 ${activity.history.length} 次更新仍按“前向计算—求 Loss—求梯度—同时更新参数”的顺序执行；下一次迭代只能使用本次产生的新参数。`}
+              </KnowledgePoint>
+            )}
+
             {waitingForReflection && (
               <section className="gd-oscillation-question">
                 <OscillationQuestion
@@ -1112,10 +1203,15 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
                   streamFeedback={streamOscillationFeedback}
                   onChange={changeOscillationAnswer}
                   onBlur={persistOscillationDraft}
-                  onSubmit={() => {
-                    void submitOscillation();
-                  }}
+                    onSubmit={() => {
+                      void submitOscillation();
+                    }}
                 />
+                {activity.feedbackResolved && (
+                  <KnowledgePoint ariaLabel="震荡处理知识点" title="知识点：处理震荡是在控制更新幅度">
+                    减小学习率会缩短沿负梯度方向移动的距离，使参数不易反复越过低损失区域。它不会改变当前梯度的数学定义，只会改变梯度对本次参数更新的缩放程度。
+                  </KnowledgePoint>
+                )}
                 {activity.feedbackResolved && (
                   <Button
                     variant="primary"
@@ -1136,6 +1232,13 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
               学习率为 0 时参数变化量也是 0。请把学习率调到大于 0，再执行下一步。
             </NoticeStrip>
           )}
+          {activity.learningRateStarted
+            && activity.stepRatioSelected
+            && !activity.completed && (
+            <KnowledgePoint ariaLabel="学习率调节知识点" title="知识点：学习率是更新规则的超参数">
+              你把当前步长比例设为 {format(activity.stepRatio, 2)}。它控制参数沿负梯度方向移动多远：数值较小通常更稳定但需要更多次更新，数值较大可能更快，也更容易越过低损失区域。
+            </KnowledgePoint>
+          )}
 
           {activity.completed && (
             <Callout
@@ -1145,7 +1248,25 @@ export function AutoUpdateBlock({ onComplete }: AutoUpdateBlockProps) {
               text="Loss 已经足够小。学习率决定每次更新走多大：太大会来回震荡，适当缩小才能稳定靠近最优点。"
             />
           )}
+          {activity.completed && (
+            <KnowledgePoint ariaLabel="停止条件知识点" title="知识点：达到停止阈值不等于证明全局最优">
+              本演示在 Loss 足够小时停止，是一个工程停止条件。它说明当前参数已经满足本页要求，但不能单独证明参数序列已在数学意义上收敛，也不能证明找到了所有可能参数中的全局最优解。
+            </KnowledgePoint>
+          )}
         </div>
+
+        {derivativesComplete && (
+          <ChainRuleSection />
+        )}
+
+        {activity.learningRateStarted && (
+          <>
+            <LearningRateSection />
+            <OptimizationLandscapeSection />
+            <MomentumSection />
+            <GradientClippingSection />
+          </>
+        )}
 
         <div className="gd-auto-network-card">
           <GradientNetworkDiagram

@@ -11,6 +11,9 @@ import { AutoUpdateBlock } from '../../modules/Gradient-Descent-Module-React/blo
 import { FullNetworkTrainingBlock } from '../../modules/Gradient-Descent-Module-React/blocks/FullNetworkTrainingBlock';
 import { ManualTuningBlock } from '../../modules/Gradient-Descent-Module-React/blocks/ManualTuningBlock';
 import { ResourcesBlock as GradientResourcesBlock } from '../../modules/Gradient-Descent-Module-React/blocks/ResourcesBlock';
+import { AdvancedBlock as LossAdvancedBlock } from '../../modules/Loss-Guide-React/blocks/AdvancedBlock';
+import { CrossEntropyBlock } from '../../modules/Loss-Guide-React/blocks/CrossEntropyBlock';
+import { AdvancedBlock as GradientAdvancedBlock } from '../../modules/Gradient-Descent-Module-React/blocks/AdvancedBlock';
 import { GradientBlock } from '../../modules/Loss-Guide-React/blocks/GradientBlock';
 import { LossCalculationBlock } from '../../modules/Loss-Guide-React/blocks/LossCalculationBlock';
 import { NumberLineBlock } from '../../modules/Loss-Guide-React/blocks/NumberLineBlock';
@@ -65,6 +68,8 @@ const blockPreviews = [
   { id: 'loss-number-line', group: '损失函数导览', title: '数轴距离', description: '通过数轴理解预测与真实值之间的距离。', path: '/dev/blocks/loss-guide-react/number-line' },
   { id: 'loss-calculation', group: '损失函数导览', title: '损失计算', description: '独立调试损失计算教学块。', path: '/dev/blocks/loss-guide-react/calculation' },
   { id: 'loss-gradient', group: '损失函数导览', title: 'L1 与 L2 梯度', description: '独立调试梯度比较教学块。', path: '/dev/blocks/loss-guide-react/gradient' },
+  { id: 'loss-cross-entropy', group: '损失函数导览', title: '分类与交叉熵', description: '独立调试交叉熵教学块。', path: '/dev/blocks/loss-guide-react/cross-entropy' },
+  { id: 'loss-advanced', group: '损失函数导览', title: '延伸拓展', description: '独立调试延伸拓展内容块。', path: '/dev/blocks/loss-guide-react/advanced' },
   { id: 'loss-resources', group: '损失函数导览', title: '推荐资源', description: '独立调试课程结尾与推荐资源。', path: '/dev/blocks/loss-guide-react/resources' },
 ];
 
@@ -105,6 +110,18 @@ function CalculationPreview() {
 
 function GradientPreview() {
   return <BlockPreview title="L1 与 L2 梯度">{({ complete }) => <GradientBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function CrossEntropyPreview() {
+  return <BlockPreview title="分类与交叉熵">{({ complete }) => <CrossEntropyBlock onComplete={complete} />}</BlockPreview>;
+}
+
+function AdvancedPreview() {
+  return <BlockPreview title="延伸拓展">{() => <LossAdvancedBlock />}</BlockPreview>;
+}
+
+function GradientAdvancedPreview() {
+  return <BlockPreview title="延伸拓展">{() => <GradientAdvancedBlock />}</BlockPreview>;
 }
 
 function ResourcesPreview() {
@@ -283,10 +300,13 @@ export const appRoutes: AppRoute[] = [
   { path: '/dev/blocks/loss-guide-react/number-line', element: <NumberLinePreview /> },
   { path: '/dev/blocks/loss-guide-react/calculation', element: <CalculationPreview /> },
   { path: '/dev/blocks/loss-guide-react/gradient', element: <GradientPreview /> },
+  { path: '/dev/blocks/loss-guide-react/cross-entropy', element: <CrossEntropyPreview /> },
+  { path: '/dev/blocks/loss-guide-react/advanced', element: <AdvancedPreview /> },
   { path: '/dev/blocks/loss-guide-react/resources', element: <ResourcesPreview /> },
   { path: '/dev/blocks/gradient-descent-module-react/manual-tuning', element: <GradientManualPreview /> },
   { path: '/dev/blocks/gradient-descent-module-react/auto-update', element: <GradientAutoUpdatePreview /> },
   { path: '/dev/blocks/gradient-descent-module-react/full-network', element: <GradientFullNetworkPreview /> },
+  { path: '/dev/blocks/gradient-descent-module-react/advanced', element: <GradientAdvancedPreview /> },
   { path: '/dev/blocks/gradient-descent-module-react/resources', element: <GradientResourcesPreview /> },
   { path: '/dev/blocks/activation-func-module-react/linear-2d', element: <ActivationLinear2DPreview /> },
   { path: '/dev/blocks/activation-func-module-react/linear-3d', element: <ActivationLinear3DPreview /> },

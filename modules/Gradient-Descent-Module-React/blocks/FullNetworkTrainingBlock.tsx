@@ -5,6 +5,7 @@ import {
   ContentBlock,
   PlotlyChart,
   TextInput,
+  Typography,
 } from '../../shared/react';
 import { emitTelemetry, getTelemetryState } from '../../shared/react/telemetry';
 import { GradientNetworkDiagram } from '../components/GradientNetworkDiagram';
@@ -16,6 +17,7 @@ import {
   stepFullNetwork,
   type FullWeights,
 } from '../model/gradientMath';
+import { BackpropagationSection, FullNetworkTransition, KnowledgePoint, NetworkObjectiveSection } from './rigor';
 
 export interface FullNetworkTrainingBlockProps {
   onComplete: () => void;
@@ -149,6 +151,8 @@ export function FullNetworkTrainingBlock({ onComplete }: FullNetworkTrainingBloc
   }, [hydrated, onComplete, readyToComplete, targetCommitted]);
 
   const forward = forwardFullNetwork(snapshot.weights, snapshot.target);
+  const completedTrainingSteps = Math.max(0, snapshot.lossHistory.length - 1);
+  const latestTrainingLoss = snapshot.lossHistory[snapshot.lossHistory.length - 1] ?? forward.loss;
   const chartData = useMemo(() => [{
     type: 'scatter',
     mode: 'lines+markers',
@@ -296,6 +300,9 @@ export function FullNetworkTrainingBlock({ onComplete }: FullNetworkTrainingBloc
         title="现在，让整个网络一起学习"
         subtitle="很多情况下，网络里的所有参数都可以用同样的方法更新。"
       >
+      <FullNetworkTransition />
+      <NetworkObjectiveSection />
+
       <div className="gd-react-final-grid">
         <div className="gd-react-control-card gd-target-entry">
           <span className="edu-kicker">设置真实值 GT</span>
@@ -357,12 +364,30 @@ export function FullNetworkTrainingBlock({ onComplete }: FullNetworkTrainingBloc
         </div>
       </div>
 
+      {targetCommitted && snapshot.target !== null && !snapshot.hasTrained && (
+        <KnowledgePoint ariaLabel="训练目标知识点" title="知识点：GT 是监督信号，不是待学习参数">
+          你设置的 GT = {snapshot.target} 决定了模型当前要接近的目标，因此也改变了 Loss 和梯度；训练过程中被更新的是网络权重，而不是这个由数据提供的真实值。
+        </KnowledgePoint>
+      )}
+
       <GradientNetworkDiagram
         mode="full"
         weights={snapshot.weights}
         target={snapshot.target}
         updating={training}
       />
+
+      {snapshot.hasTrained && (
+        <KnowledgePoint
+          ariaLabel="完整训练知识点"
+          title="知识点：一次训练包含三个职责不同的阶段"
+          caption="本页仍是单样本演示；一次训练后 Loss 下降，只说明当前样本上的目标被降低，不能直接代表模型在其他数据上的表现。"
+        >
+          第 {completedTrainingSteps} 次训练先用旧参数完成前向传播并计算 Loss，再由反向传播求出全部参数梯度，最后由更新规则同时生成新参数。当前 Loss 为 {latestTrainingLoss === null ? '—' : latestTrainingLoss.toFixed(4)}。
+        </KnowledgePoint>
+      )}
+
+      <BackpropagationSection />
 
       {targetCommitted && readyToComplete && (
         <Callout

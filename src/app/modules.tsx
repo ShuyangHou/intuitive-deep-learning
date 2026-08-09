@@ -18,6 +18,12 @@ export interface MigratedModule {
   path: string;
   badge: string;
   element: ReactNode;
+  /** 模块类型：teaching = 教材型课堂模块，popular-science = 科普互动模块 */
+  moduleType?: 'teaching' | 'popular-science';
+  /** 难度级别：introductory = 入门（无需微积分），intermediate = 中级（需要高数/线代基础），advanced = 高级（研究导向） */
+  difficulty?: 'introductory' | 'intermediate' | 'advanced';
+  /** 目标受众：undergraduate = 本科生，general = 普通大众，graduate = 研究生 */
+  audience?: 'undergraduate' | 'general' | 'graduate';
 }
 
 export const migratedModules: MigratedModule[] = [
@@ -64,10 +70,13 @@ export const migratedModules: MigratedModule[] = [
   {
     id: 'loss-guide-react',
     title: '损失函数导览',
-    description: '从预测误差、损失计算到 L1／L2 梯度的交互式学习流程。',
+    description: '从预测误差、损失计算到 L1／L2 梯度、交叉熵的完整损失函数教学模块。',
     path: '/modules/loss-guide-react',
-    badge: 'React 迁移版',
+    badge: '教材型教学模块',
     element: <LossGuidePage />,
+    moduleType: 'teaching',
+    difficulty: 'intermediate',
+    audience: 'undergraduate',
   },
   {
     id: 'formula-tooltip-react',

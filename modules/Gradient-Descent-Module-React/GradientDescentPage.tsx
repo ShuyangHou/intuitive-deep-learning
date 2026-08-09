@@ -1,5 +1,6 @@
 import { LessonFlow, ModuleShell, type LessonFlowStep } from '../shared/react';
 import './gradient-descent-module-react.css';
+import { AdvancedBlock } from './blocks/AdvancedBlock';
 import { AutoUpdateBlock } from './blocks/AutoUpdateBlock';
 import { FullNetworkTrainingBlock } from './blocks/FullNetworkTrainingBlock';
 import { ManualTuningBlock } from './blocks/ManualTuningBlock';
@@ -21,6 +22,11 @@ const steps: LessonFlowStep[] = [
     revealMode: 'cue',
     completesLesson: true,
     render: ({ complete }) => <FullNetworkTrainingBlock onComplete={complete} />,
+  },
+  {
+    id: 'advanced',
+    revealMode: 'scroll',
+    render: () => <AdvancedBlock />,
   },
   {
     id: 'resources',
